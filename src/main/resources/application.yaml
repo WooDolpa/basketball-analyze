@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: basketball-analyze
+#  datasource:
+#
+#    # 로컬 개발 기본값 (compose.yaml과 동일). 운영 환경은 환경변수로 덮어쓴다.
+#    url:  jdbc:mariadb://${MARIADB_URL:}
+#    username: ${MARIADB_USERNAME}
+#    password: ${MARIADB_PASSWORD}
