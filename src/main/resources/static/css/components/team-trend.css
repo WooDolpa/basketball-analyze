@@ -1,0 +1,55 @@
+/* team-trend: 페이지와 독립적인 분석 위젯 스타일입니다. */
+.trend-panel { display: flex; flex-direction: column; }
+.trend-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 21px 23px 0; }
+.chart-legend { display: flex; gap: 15px; }
+.chart-legend > span { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; color: var(--muted); }
+.trend-chart { padding: 16px 18px 0 11px; margin-block: auto; }
+.trend-chart svg { width: 100%; overflow: visible; }
+.chart-gridline { stroke: #30382c; stroke-width: 1; stroke-dasharray: 3 5; }
+.chart-axis-label { fill: var(--subtle); font-family: var(--font-numeric); font-size: 10px; }
+.chart-area { fill: #c5f36b08; }
+.chart-line { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.chart-line-scored { stroke: var(--accent); stroke-width: 2.5; }
+.chart-line-conceded { stroke: #829581; stroke-width: 1.8; stroke-dasharray: 5 5; }
+.chart-dot-scored { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+.chart-dot-conceded { fill: var(--surface); stroke: #829581; stroke-width: 1.5; }
+.chart-point-group { cursor: pointer; }
+.chart-point-group:focus { outline: none; }
+.chart-point-group.is-selected .chart-dot-scored { fill: var(--accent); r: 5.5; stroke-width: 3; stroke: #3f512b; }
+.chart-point-group:focus-visible .chart-dot-scored { stroke: white; stroke-width: 3; }
+.chart-selection-line { stroke: #9cae7d; stroke-opacity: .25; stroke-dasharray: 3 4; stroke-width: 1; pointer-events: none; }
+.chart-detail { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0 23px 17px; padding: 9px 11px; border: 1px solid var(--border); background: #1d241a; border-radius: 5px; color: var(--muted); font-family: var(--font-numeric); font-size: 10px; }
+.chart-detail > span { display: inline-flex; gap: 8px; align-items: center; }
+.chart-detail strong { color: var(--text-secondary); font-family: var(--font); font-size: 9px; font-weight: 400; }
+.detail-divider { color: var(--subtle); }
+.trend-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 23px; padding: 19px 0 21px; border-top: 1px solid var(--border); }
+.trend-summary > div + div { border-left: 1px solid var(--border); padding-left: 16px; }
+.trend-summary span { display: block; font-size: 8px; color: var(--muted); white-space: nowrap; }
+.trend-summary strong { display: block; margin-top: 5px; color: var(--text-secondary); font-family: var(--font-numeric); font-size: 21px; font-weight: 400; letter-spacing: -.7px; white-space: nowrap; }
+.trend-summary small { color: var(--muted); font-family: var(--font); font-size: 9px; margin-left: 3px; font-weight: 400; }
+@media (min-width: 1600px) {
+    .trend-chart { padding-top: 24px; }
+}
+@media (max-width: 1250px) {
+    .trend-toolbar { padding-inline: 18px; }
+    .trend-summary { margin-inline: 18px; }
+    .trend-summary > div + div { padding-left: 10px; }
+    .trend-summary strong { font-size: 18px; }
+    .trend-summary span { font-size: 7px; }
+}
+@media (max-width: 760px) {
+    .trend-chart { margin: 0; padding-top: 20px; }
+    .trend-summary { padding-block: 19px; }
+    .trend-summary strong { font-size: 22px; }
+    .trend-summary span { font-size: 9px; }
+}
+@media (max-width: 480px) {
+    .trend-toolbar { padding-inline: 16px; }
+    .trend-summary { margin-inline: 16px; }
+    .trend-summary > div + div { padding-left: 7px; }
+    .trend-summary strong { font-size: 18px; }
+    .trend-summary span { font-size: 7px; }
+    .trend-summary small { font-size: 8px; margin-left: 2px; }
+    .trend-chart { padding-inline: 6px 12px; }
+    .chart-detail { margin-inline: 16px; }
+}

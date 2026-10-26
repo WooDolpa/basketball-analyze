@@ -1,0 +1,14 @@
+/* 선수 리더 카드와 전체 선수 기록을 독립된 페이지로 배치합니다. */
+.season-caption { font-size: 11px; color: var(--muted); white-space: nowrap; }
+body[data-page="player-records"] .leaders-panel { margin-top: 0; }
+.player-records-panel { overflow: hidden; margin-top: 24px; }
+.player-records-panel .panel-heading { padding-bottom: 20px; }
+.player-records-table { min-width: 600px; }
+.player-records-table tr > :first-child { width: 70px; }
+.player-records-table .standings-team { justify-content: flex-start; font-size: 12px; }
+.player-records-table tr > :nth-child(3) { text-align: left; }
+.player-records-table thead th:nth-child(3) { padding-left: 24px; }
+body[data-page="player-records"] .player-card { padding-block: 25px; }
+@media (max-width: 760px) {
+    .player-records-panel .panel-heading { flex-wrap: wrap; }
+}

@@ -1,0 +1,66 @@
+/* 여러 화면에서 재사용할 카드, 버튼, 선택 필드와 상태 표시입니다. */
+.eyebrow { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 8px; font-weight: 650; letter-spacing: 2px; }
+.small-line { width: 16px; height: 2px; background: var(--accent); }
+.panel { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 22px 23px 0; }
+.panel-heading h2 { display: flex; align-items: center; gap: 8px; }
+.panel-heading h2 .icon { width: 17px; height: 17px; }
+.panel-subtitle { margin-top: 5px; font-size: 10px; color: var(--muted); }
+.micro-label { font-size: 7px; letter-spacing: 1.5px; color: var(--subtle); white-space: nowrap; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 10px 13px; border: 1px solid transparent; border-radius: 7px; font-size: 10px; font-weight: 500; white-space: nowrap; transition: background .15s, border-color .15s; }
+.button .icon { width: 15px; height: 15px; }
+.button-secondary { color: var(--text-secondary); border-color: #384034; background: var(--surface); }
+.button-secondary:hover { background: #252e20; border-color: #566147; color: var(--text); }
+.icon-button { display: inline-flex; justify-content: center; align-items: center; width: 28px; height: 28px; padding: 4px; border: none; border-radius: 5px; background: transparent; color: var(--muted); }
+.icon-button:hover:not(:disabled) { background: var(--surface-hover); color: var(--text); }
+.icon-button .icon { width: 17px; height: 17px; }
+.text-button { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: none; font-size: 9px; color: var(--accent); }
+.text-button .icon { width: 14px; height: 14px; transition: transform .2s; }
+.text-button:hover .icon { transform: translateX(3px); }
+.demo-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid #3c3c2d; border-radius: 5px; color: #bdb78f; background: #25251b; font-size: 9px; }
+.demo-badge > span { width: 4px; height: 4px; border-radius: 50%; background: #bdb78f; }
+.status-dot { display: inline-block; flex-shrink: 0; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
+.count-pill { display: inline-grid; place-items: center; height: 21px; min-width: 24px; padding: 0 6px; border: 1px solid var(--border); border-radius: 5px; color: var(--accent); font-family: var(--font-numeric); font-size: 10px; font-weight: 400; }
+.select-wrap { position: relative; }
+.select-wrap select { appearance: none; width: 100%; min-height: 38px; padding: 8px 30px 8px 11px; background: var(--surface); border: 1px solid #35402e; border-radius: 6px; font-size: 10px; cursor: pointer; }
+.select-wrap > .icon { position: absolute; right: 9px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+.compact-select select { min-height: 31px; padding-block: 5px; border-color: var(--border); }
+.segmented-control { display: flex; flex-shrink: 0; gap: 3px; padding: 3px; border: 1px solid var(--border); border-radius: 6px; background: #151915; }
+.segmented-control button { padding: 5px 9px; background: none; color: var(--muted); border: 0; border-radius: 4px; font-size: 9px; white-space: nowrap; }
+.segmented-control button.is-active { color: var(--text); background: #2c3327; box-shadow: 0 1px 3px #0003; }
+.segmented-control button:hover { color: var(--text); }
+.team-badge { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 27px; height: 27px; border: 1px solid color-mix(in srgb, var(--team-color) 25%, transparent); border-radius: 7px; background: color-mix(in srgb, var(--team-color) 10%, #1b201b); color: var(--team-color); font-family: var(--font-numeric); font-size: 9px; font-weight: 650; letter-spacing: -.5px; }
+.team-badge.small { width: 23px; height: 23px; border-radius: 6px; font-size: 8px; }
+.team-badge.large { width: 67px; height: 67px; border-radius: 17px; font-size: 23px; border-width: 1px; letter-spacing: -1px; box-shadow: 0 8px 25px #0002; }
+.result-badge { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 4px; font-size: 9px; }
+.result-badge.win { background: #2d3d1e; color: var(--accent); }
+.result-badge.loss { background: #372820; color: var(--orange); }
+.legend-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+.legend-dot.scored { background: var(--accent); }
+.legend-dot.conceded { background: #829581; }
+.toast { position: fixed; z-index: 100; bottom: 24px; left: 50%; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 20px; border: 1px solid #4b6037; border-radius: 8px; background: #26341f; color: var(--text); font-size: 12px; box-shadow: 0 8px 40px #0006; }
+
+/* 도움말은 네이티브 dialog를 사용해 포커스와 Escape 닫기를 지원합니다. */
+.guide-dialog { width: min(470px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 25px; color: var(--text); background: var(--surface); border: 1px solid #46553a; border-radius: 15px; box-shadow: 0 20px 100px #0007; }
+.guide-dialog::backdrop { background: #080d09c9; backdrop-filter: blur(5px); }
+.dialog-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+.guide-dialog h2 { font-size: 22px; letter-spacing: -.8px; }
+.guide-dialog > p { color: var(--muted); font-size: 12px; line-height: 1.9; margin-top: 12px; }
+.guide-dialog ol { padding-left: 22px; margin-block: 24px; color: var(--accent); }
+.guide-dialog li { padding-left: 5px; margin-top: 17px; font-size: 12px; }
+.guide-dialog li strong { color: var(--text); display: block; font-weight: 600; }
+.guide-dialog li span { display: block; color: var(--muted); line-height: 1.9; margin-top: 5px; }
+.dialog-footer { display: flex; align-items: center; gap: 7px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); }
+.noscript-message { position: fixed; z-index: 200; inset: 20px 20px auto; padding: 20px; background: #2c3327; border: 1px solid var(--accent); text-align: center; }
+
+/* 여러 분석 화면에서 공유하는 반응형 보정입니다. */
+@media (max-width: 1250px) {
+    .panel-heading { padding-inline: 18px; }
+}
+@media (max-width: 480px) {
+    .team-badge.large { width: 59px; height: 59px; font-size: 21px; }
+    .panel-heading { gap: 8px; padding-inline: 16px; }
+    .panel h2 { font-size: 14px; }
+    .panel-subtitle { font-size: 9px; }
+    .compact-select select { max-width: 115px; font-size: 9px; }
+}

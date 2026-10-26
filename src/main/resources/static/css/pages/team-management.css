@@ -1,0 +1,33 @@
+/* 팀관리 페이지의 팀 프로필과 차트·시즌 기록 배치입니다. */
+.team-picker { min-width: 160px; }
+.team-picker > label { display: block; margin-bottom: 5px; font-size: 9px; color: var(--muted); }
+.team-identity-panel { display: flex; align-items: center; gap: 25px; flex-wrap: wrap; padding: 26px; }
+.team-profile { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 230px; }
+.team-profile h2 { font-size: 22px; margin-top: 7px; letter-spacing: -.7px; }
+.team-profile p { font-size: 10px; color: var(--muted); margin-top: 6px; }
+.team-profile .eyebrow { font-size: 8px; letter-spacing: .7px; }
+.team-profile-form { display: flex; flex-direction: column; gap: 8px; }
+.team-profile-form > span:first-child { font-size: 9px; color: var(--muted); }
+.team-profile-form .form-dots i { width: 7px; height: 17px; }
+.team-management-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(235px, 1fr); gap: 20px; margin-top: 22px; }
+.team-management-grid > * { min-width: 0; }
+.team-management-grid .trend-chart { margin-block: 12px; }
+.team-management-grid .trend-chart svg { max-height: 300px; }
+.team-season-rank { display: flex; justify-content: space-between; align-items: baseline; padding: 28px 24px; }
+.team-season-rank > span { font-size: 11px; color: var(--muted); }
+.team-season-rank strong { font-family: var(--font-numeric); font-size: 54px; font-weight: 450; color: var(--accent); line-height: 1; }
+.team-season-rank small { margin-left: 5px; font-family: var(--font); font-size: 13px; color: var(--muted); }
+.team-season-stats { margin: 0 24px; }
+.team-season-stats > div { display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid var(--border); }
+.team-season-stats dt { color: var(--muted); font-size: 11px; }
+.team-season-stats dd { margin: 0; font-family: var(--font-numeric); font-size: 17px; }
+.team-season-note { margin: 9px 24px 20px; color: var(--subtle); font-size: 9px; line-height: 1.8; }
+.recent-games-panel { margin-top: 24px; overflow: hidden; }
+.recent-games-panel .panel-heading { padding-bottom: 20px; }
+@media (max-width: 760px) {
+    .team-management-grid { grid-template-columns: minmax(0, 1fr); }
+    .team-identity-panel { padding: 21px; gap: 20px; }
+    .team-profile { min-width: 220px; }
+    .team-profile h2 { font-size: 18px; }
+    .team-picker { min-width: 140px; }
+}

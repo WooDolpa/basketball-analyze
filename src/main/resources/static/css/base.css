@@ -1,0 +1,54 @@
+/* 색상·타이포그래피·접근성 등 모든 화면에서 사용하는 기반 스타일입니다. */
+:root {
+    color-scheme: dark;
+    --bg: #111412;
+    --sidebar-bg: #131613;
+    --surface: #191d19;
+    --surface-hover: #202620;
+    --surface-soft: #1e231e;
+    --border: #2b322b;
+    --border-soft: #252c25;
+    --text: #f0f2eb;
+    --text-secondary: #bac1b6;
+    --muted: #929c8e;
+    --subtle: #87917e;
+    --muted-line: #6b7c60;
+    --accent: #c5f36b;
+    --accent-soft: #26321b;
+    --orange: #eaa776;
+    --sidebar-width: 216px;
+    --radius: 12px;
+    --font: 'Segoe UI Variable Text', 'Segoe UI', 'Malgun Gothic', sans-serif;
+    --font-numeric: 'Bahnschrift', 'Segoe UI', 'Malgun Gothic', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; }
+button, select, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button { color: inherit; }
+button:disabled { cursor: default; opacity: .3; }
+a { color: inherit; text-decoration: none; }
+button, a, select { touch-action: manipulation; }
+button:focus-visible, a:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { line-height: 1.4; word-break: keep-all; }
+svg { display: block; }
+[hidden] { display: none !important; }
+::selection { color: #14200d; background: var(--accent); }
+select { color: var(--text); color-scheme: dark; }
+option { background: var(--surface); }
+small { font-size: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; padding: 10px 16px; transform: translateY(-150%); color: var(--bg); background: var(--accent); border-radius: 6px; }
+.skip-link:focus { transform: translateY(0); }
+.accent-text { color: var(--accent) !important; }
+.icon { width: 19px; height: 19px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.section-anchor { scroll-margin-top: 25px; }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

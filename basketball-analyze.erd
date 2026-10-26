@@ -1,0 +1,471 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dineug/erd-editor/main/json-schema/schema.json",
+  "version": "3.0.0",
+  "settings": {
+    "originX": 0,
+    "originY": 0,
+    "zoomLevel": 1,
+    "show": 431,
+    "database": 4,
+    "databaseName": "",
+    "canvasType": "ERD",
+    "language": 1,
+    "tableNameCase": 4,
+    "columnNameCase": 2,
+    "bracketType": 1,
+    "relationshipDataTypeSync": true,
+    "columnOrder": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64
+    ],
+    "maxWidthComment": -1,
+    "lockSettings": 63
+  },
+  "doc": {
+    "tableIds": [
+      "03h49b4u6f2jjp2829hmj3mls",
+      "03h49wkcotl5wiqz01xlmhxqi",
+      "03h49wxbhlcwqrzfvnotas8v9",
+      "03h4agd0em54n2hffx9ms0mll",
+      "03h4b08gho5thk9v5s2kp49r7"
+    ],
+    "relationshipIds": [
+      "03h4aggl0ecn3n4jeffqsuzq0",
+      "03h4agqgyfmhto4gexo0vxa3v"
+    ]
+  },
+  "collections": {
+    "tableEntities": {
+      "03h49b4u6f2jjp2829hmj3mls": {
+        "id": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "cc_season",
+        "comment": "시즌",
+        "columnIds": [
+          "03h49b6j40p0xcauq9tu2ndb6",
+          "03h49vj3c26rquxcaa7rvfp07",
+          "03h49vloyl02hpv68j6lq3j5r",
+          "03h49uwrn8q7flj0bpyfzf6px",
+          "03h49v2lo8u86tr1axgowfwm5",
+          "03h49vb6ww78jxsmzrmlqejoe"
+        ],
+        "ui": {
+          "x": -453.4197,
+          "y": -1414.3116
+        }
+      },
+      "03h49wkcotl5wiqz01xlmhxqi": {
+        "id": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "cc_team",
+        "comment": "팀",
+        "columnIds": [
+          "03h49wlhg6mhvlt1gpmdcnk79",
+          "03h49wpzd7t9xzq2gajpbfvsy",
+          "03h4au7lw1m04a3p53772jlex",
+          "03h49wsx2buowny5u5r9f3pap",
+          "03h49wt9o253r9ixrk81lyp4m",
+          "03h49wt9o253r9ixrkaq23qea"
+        ],
+        "ui": {
+          "x": -366.5119,
+          "y": -995.4913
+        }
+      },
+      "03h49wxbhlcwqrzfvnotas8v9": {
+        "id": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "cc_player",
+        "comment": "선수",
+        "columnIds": [
+          "03h49wy930xd0ehfmtzx5kajd",
+          "03h4ab87hd1800xe6vvsvomaz",
+          "03h4abbbgt032z8tpoei1rqo7",
+          "03h4aa5p1zynr0g2awa5qrnpu",
+          "03h4afk5wdercw0sw6g5yor6q",
+          "03h4abjot3hzs3npdzr3ua76t",
+          "03h4abrgxh5a4529pxkpplwnm",
+          "03h4adhan3ixm41jgobbwiw90",
+          "03h4adwy2zvff1cz2tta6hog6",
+          "03h4ae21q0mh3d50kyvemda6z",
+          "03h4ae8k3cab5v6lp0izrb0a0",
+          "03h4ae8xp2cpuwjdu2g13ah9v",
+          "03h4ae8xp2cpuwjdu2i65srk1"
+        ],
+        "ui": {
+          "x": -370.623,
+          "y": -795.6477
+        }
+      },
+      "03h4agd0em54n2hffx9ms0mll": {
+        "id": "03h4agd0em54n2hffx9ms0mll",
+        "name": "cc_season_team",
+        "comment": "시즌 팀",
+        "columnIds": [
+          "03h4agxv468lunavq4mp3cujq",
+          "03h4aggl08w5bmhep1f6rm9ar",
+          "03h4agqgya0vvsmo5x0wq65jk",
+          "03h4avfaq8aypuwsegwm1kw4l",
+          "03h4avhz8cm9r240t1fybxjs0",
+          "03h4avpxle1eb6kh0181w1zg3",
+          "03h4avrndiqthrd8ppxzr3up5",
+          "03h4awdd6flcmxrxemhka92vx",
+          "03h4awo7y961qglmwmepqdkx6",
+          "03h4awufa7e8vsm7mp0ejwy76",
+          "03h4awufa7e8vsm7mp26sthfi"
+        ],
+        "ui": {
+          "x": -1104.8789,
+          "y": -1115.9206
+        }
+      },
+      "03h4b08gho5thk9v5s2kp49r7": {
+        "id": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "cc_season_team_roster",
+        "comment": "시즌 팀 로스터",
+        "columnIds": [
+          "03h4b0avcumizvtmdzpcwpgej"
+        ],
+        "ui": {
+          "x": -1520.0219,
+          "y": -738.6614
+        }
+      }
+    },
+    "tableColumnEntities": {
+      "03h49b6j40p0xcauq9tu2ndb6": {
+        "id": "03h49b6j40p0xcauq9tu2ndb6",
+        "tableId": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "id",
+        "comment": "시즌 아이디",
+        "dataType": "VARCHAR(9)",
+        "options": 10
+      },
+      "03h49uwrn8q7flj0bpyfzf6px": {
+        "id": "03h49uwrn8q7flj0bpyfzf6px",
+        "tableId": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "data_status",
+        "comment": "데이터 상태 (Y : 사용, N : 미사용, D : 삭제) ",
+        "dataType": "CHAR(1)",
+        "options": 8
+      },
+      "03h49v2lo8u86tr1axgowfwm5": {
+        "id": "03h49v2lo8u86tr1axgowfwm5",
+        "tableId": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h49vb6ww78jxsmzrmlqejoe": {
+        "id": "03h49vb6ww78jxsmzrmlqejoe",
+        "tableId": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h49vj3c26rquxcaa7rvfp07": {
+        "id": "03h49vj3c26rquxcaa7rvfp07",
+        "tableId": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "start_year",
+        "comment": "시작년도",
+        "dataType": "VARCHAR(4)",
+        "options": 8
+      },
+      "03h49vloyl02hpv68j6lq3j5r": {
+        "id": "03h49vloyl02hpv68j6lq3j5r",
+        "tableId": "03h49b4u6f2jjp2829hmj3mls",
+        "name": "end_year",
+        "comment": "종료년도",
+        "dataType": "VARCHAR(4)",
+        "options": 8
+      },
+      "03h49wlhg6mhvlt1gpmdcnk79": {
+        "id": "03h49wlhg6mhvlt1gpmdcnk79",
+        "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "id",
+        "comment": "팀아이디",
+        "dataType": "VARCHAR(3)",
+        "options": 10
+      },
+      "03h49wpzd7t9xzq2gajpbfvsy": {
+        "id": "03h49wpzd7t9xzq2gajpbfvsy",
+        "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "name",
+        "comment": "팀명",
+        "dataType": "VARCHAR(10)",
+        "options": 8
+      },
+      "03h49wsx2buowny5u5r9f3pap": {
+        "id": "03h49wsx2buowny5u5r9f3pap",
+        "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "data_status",
+        "comment": "데이터 상태 (Y : 사용, N : 미사용, D : 삭제) ",
+        "dataType": "CHAR(1)",
+        "options": 8
+      },
+      "03h49wt9o253r9ixrk81lyp4m": {
+        "id": "03h49wt9o253r9ixrk81lyp4m",
+        "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h49wt9o253r9ixrkaq23qea": {
+        "id": "03h49wt9o253r9ixrkaq23qea",
+        "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h4au7lw1m04a3p53772jlex": {
+        "id": "03h4au7lw1m04a3p53772jlex",
+        "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+        "name": "eng_name",
+        "comment": "영문 이름",
+        "dataType": "VARCHAR(20)",
+        "options": 0
+      },
+      "03h49wy930xd0ehfmtzx5kajd": {
+        "id": "03h49wy930xd0ehfmtzx5kajd",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "id",
+        "comment": "선수 아이디",
+        "dataType": "VARCHAR(5)",
+        "options": 8
+      },
+      "03h4aa5p1zynr0g2awa5qrnpu": {
+        "id": "03h4aa5p1zynr0g2awa5qrnpu",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "code",
+        "comment": "선수 코드",
+        "dataType": "VARCHAR(6)",
+        "options": 8
+      },
+      "03h4ab87hd1800xe6vvsvomaz": {
+        "id": "03h4ab87hd1800xe6vvsvomaz",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "name",
+        "comment": "선수 이름",
+        "dataType": "VARCHAR(10)",
+        "options": 8
+      },
+      "03h4abbbgt032z8tpoei1rqo7": {
+        "id": "03h4abbbgt032z8tpoei1rqo7",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "eng_name",
+        "comment": "선수 이름(영문)",
+        "dataType": "VARCHAR(30)",
+        "options": 0
+      },
+      "03h4abjot3hzs3npdzr3ua76t": {
+        "id": "03h4abjot3hzs3npdzr3ua76t",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "birth_date",
+        "comment": "생년월일",
+        "dataType": "VARCHAR(8)",
+        "options": 0
+      },
+      "03h4abrgxh5a4529pxkpplwnm": {
+        "id": "03h4abrgxh5a4529pxkpplwnm",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "nationality",
+        "comment": "국적",
+        "dataType": "VARCHAR(10)",
+        "options": 0
+      },
+      "03h4adhan3ixm41jgobbwiw90": {
+        "id": "03h4adhan3ixm41jgobbwiw90",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "division",
+        "comment": "선수 구분(국내 : 0, 외국인 : 1, 아시아쿼터 : 2)",
+        "dataType": "CHAR(1)",
+        "options": 0
+      },
+      "03h4adwy2zvff1cz2tta6hog6": {
+        "id": "03h4adwy2zvff1cz2tta6hog6",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "height",
+        "comment": "키",
+        "dataType": "DECIMAL(3,2)",
+        "options": 8
+      },
+      "03h4ae21q0mh3d50kyvemda6z": {
+        "id": "03h4ae21q0mh3d50kyvemda6z",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "weight",
+        "comment": "몸무게",
+        "dataType": "DECIMAL(3,2)",
+        "options": 0
+      },
+      "03h4ae8k3cab5v6lp0izrb0a0": {
+        "id": "03h4ae8k3cab5v6lp0izrb0a0",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "data_status",
+        "comment": "데이터 상태 (Y : 사용, N : 미사용, D : 삭제) ",
+        "dataType": "CHAR(1)",
+        "options": 8
+      },
+      "03h4ae8xp2cpuwjdu2g13ah9v": {
+        "id": "03h4ae8xp2cpuwjdu2g13ah9v",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h4ae8xp2cpuwjdu2i65srk1": {
+        "id": "03h4ae8xp2cpuwjdu2i65srk1",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h4afk5wdercw0sw6g5yor6q": {
+        "id": "03h4afk5wdercw0sw6g5yor6q",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "profile_url",
+        "comment": "프로필 이미지",
+        "dataType": "VARCHAR(128)",
+        "options": 0
+      },
+      "03h4aggl08w5bmhep1f6rm9ar": {
+        "id": "03h4aggl08w5bmhep1f6rm9ar",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "cc_season_id",
+        "comment": "시즌 아이디",
+        "dataType": "VARCHAR(9)",
+        "options": 8
+      },
+      "03h4agqgya0vvsmo5x0wq65jk": {
+        "id": "03h4agqgya0vvsmo5x0wq65jk",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "cc_team_id",
+        "comment": "팀아이디",
+        "dataType": "VARCHAR(3)",
+        "options": 8
+      },
+      "03h4agxv468lunavq4mp3cujq": {
+        "id": "03h4agxv468lunavq4mp3cujq",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "id",
+        "comment": "시즌 팀 아이디(시즌 아이디 + 팀아이디)",
+        "dataType": "VARCHAR(12)",
+        "options": 8
+      },
+      "03h4avfaq8aypuwsegwm1kw4l": {
+        "id": "03h4avfaq8aypuwsegwm1kw4l",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "rank",
+        "comment": "순위",
+        "dataType": "TINYINT(2)",
+        "options": 8
+      },
+      "03h4avhz8cm9r240t1fybxjs0": {
+        "id": "03h4avhz8cm9r240t1fybxjs0",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "win",
+        "comment": "승리",
+        "dataType": "TINYINT(2)",
+        "options": 8
+      },
+      "03h4avpxle1eb6kh0181w1zg3": {
+        "id": "03h4avpxle1eb6kh0181w1zg3",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "lose",
+        "comment": "패배",
+        "dataType": "TINYINT(2)",
+        "options": 8
+      },
+      "03h4avrndiqthrd8ppxzr3up5": {
+        "id": "03h4avrndiqthrd8ppxzr3up5",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "win_percentage",
+        "comment": "승률",
+        "dataType": "DECIMAL(3,2)",
+        "options": 8
+      },
+      "03h4awdd6flcmxrxemhka92vx": {
+        "id": "03h4awdd6flcmxrxemhka92vx",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "games_behind",
+        "comment": "승차",
+        "dataType": "DECIMAL(2,1)",
+        "options": 8
+      },
+      "03h4awo7y961qglmwmepqdkx6": {
+        "id": "03h4awo7y961qglmwmepqdkx6",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "data_status",
+        "comment": "데이터 상태 (Y : 사용, N : 미사용, D : 삭제) ",
+        "dataType": "CHAR(1)",
+        "options": 8
+      },
+      "03h4awufa7e8vsm7mp0ejwy76": {
+        "id": "03h4awufa7e8vsm7mp0ejwy76",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h4awufa7e8vsm7mp26sthfi": {
+        "id": "03h4awufa7e8vsm7mp26sthfi",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h4b0avcumizvtmdzpcwpgej": {
+        "id": "03h4b0avcumizvtmdzpcwpgej",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "options": 0
+      }
+    },
+    "relationshipEntities": {
+      "03h4aggl0ecn3n4jeffqsuzq0": {
+        "id": "03h4aggl0ecn3n4jeffqsuzq0",
+        "relationshipType": 16,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h49b4u6f2jjp2829hmj3mls",
+          "columnIds": [
+            "03h49b6j40p0xcauq9tu2ndb6"
+          ]
+        },
+        "end": {
+          "tableId": "03h4agd0em54n2hffx9ms0mll",
+          "columnIds": [
+            "03h4aggl08w5bmhep1f6rm9ar"
+          ]
+        }
+      },
+      "03h4agqgyfmhto4gexo0vxa3v": {
+        "id": "03h4agqgyfmhto4gexo0vxa3v",
+        "relationshipType": 16,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h49wkcotl5wiqz01xlmhxqi",
+          "columnIds": [
+            "03h49wlhg6mhvlt1gpmdcnk79"
+          ]
+        },
+        "end": {
+          "tableId": "03h4agd0em54n2hffx9ms0mll",
+          "columnIds": [
+            "03h4agqgya0vvsmo5x0wq65jk"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+/* player-leaders: 페이지와 독립적인 분석 위젯 스타일입니다. */
+.leaders-panel { overflow: hidden; }
+.leaders-panel .panel-heading { padding-bottom: 20px; }
+.player-leaders { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--border); }
+.player-card { position: relative; min-width: 0; padding: 18px 20px 19px; }
+.player-card + .player-card { border-left: 1px solid var(--border); }
+.player-card.is-leading { background: #20281a; }
+.player-rank { font-family: var(--font-numeric); font-size: 10px; color: var(--subtle); }
+.is-leading .player-rank { color: var(--accent); }
+.player-identity { display: flex; gap: 9px; align-items: center; margin-top: 9px; }
+.player-identity > div:last-child { min-width: 0; }
+.player-identity h3 { color: var(--text-secondary); font-size: 11px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player-identity p { display: flex; align-items: center; gap: 4px; margin-top: 3px; color: var(--subtle); font-size: 8px; white-space: nowrap; }
+.player-identity p i { width: 3px; height: 3px; border-radius: 50%; }
+.jersey-avatar { display: grid; align-items: center; justify-content: center; width: 36px; height: 39px; flex-shrink: 0; clip-path: polygon(25% 0, 37% 8%, 63% 8%, 75% 0, 100% 20%, 86% 43%, 78% 37%, 78% 100%, 22% 100%, 22% 37%, 14% 43%, 0 20%); background: color-mix(in srgb, var(--team-color) 22%, #272d25); color: color-mix(in srgb, var(--team-color) 90%, white); }
+.jersey-avatar > span { padding-top: 5px; font-family: var(--font-numeric); font-size: 12px; font-weight: 500; }
+.player-value { display: flex; align-items: baseline; gap: 7px; margin: 16px 0 0 44px; }
+.player-value strong { font-family: var(--font-numeric); font-size: 27px; font-weight: 450; letter-spacing: -1px; line-height: 1; }
+.player-value > span { color: var(--subtle); font-size: 7px; letter-spacing: 1px; }
+.is-leading .player-value strong { color: var(--accent); }
+@media (max-width: 1250px) {
+    .player-card { padding-inline: 14px; }
+    .player-identity { gap: 6px; }
+    .player-identity h3 { font-size: 10px; }
+    .player-value { margin-left: 41px; }
+}
+@media (max-width: 760px) {
+    .player-leaders { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .player-card:nth-child(4) { border-left: 0; }
+    .player-card:nth-child(n+4) { border-top: 1px solid var(--border); }
+    .player-card { padding: 16px; }
+    .leaders-panel .heading-group .section-caption { display: none; }
+}
+@media (max-width: 480px) {
+    .leaders-panel .panel-heading { flex-wrap: wrap; gap: 13px; }
+    .player-leaders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .player-card:nth-child(3) { border-left: 0; }
+    .player-card:nth-child(4) { border-left: 1px solid var(--border); }
+    .player-card:nth-child(5) { border-left: 0; }
+    .player-card:nth-child(n+3) { border-top: 1px solid var(--border); }
+    .player-card:last-child { grid-column: 1 / -1; display: flex; align-items: center; gap: 15px; }
+    .player-card:last-child .player-identity { margin-top: 0; }
+    .player-card:last-child .player-value { margin: 0 0 0 auto; }
+    .player-identity h3 { font-size: 11px; }
+    .player-value { margin-left: 43px; }
+}

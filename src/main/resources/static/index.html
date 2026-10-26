@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111312">
+    <meta name="description" content="COURTSIDE 남자 KBL 로컬 분석 워크스페이스 — 대시보드">
+    <title>대시보드 — COURTSIDE</title>
+    <link rel="icon" href="/assets/icons/court.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/components/metrics.css">
+    <link rel="stylesheet" href="/css/components/matchups.css">
+    <link rel="stylesheet" href="/css/pages/dashboard.css">
+    <script type="module" src="/js/pages/dashboard.js"></script>
+</head>
+<body data-page="dashboard">
+    <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
+    <main id="main-content">
+
+        <section class="page-heading" aria-labelledby="page-title">
+            <div><div class="eyebrow"><span class="small-line"></span>KBL ANALYTICS</div><h1 id="page-title">오늘의 코트, <span>숫자로 읽다.</span></h1><p>핵심 지표와 주목 경기, 한눈에 보는 나의 농구 인사이트.</p></div>
+            <button type="button" class="button button-secondary export-button" id="export-button"><svg class="icon"><use href="/assets/icons/sprite.svg#download"/></svg>리포트 내보내기</button>
+        </section>
+        <section class="metrics-grid" id="summary-metrics" aria-label="시즌 핵심 지표"></section>
+        <section class="matchups-section" aria-labelledby="matchups-title">
+            <div class="section-heading"><div class="heading-group"><h2 id="matchups-title">경기 요약</h2><span class="count-pill" id="match-count"></span><span class="section-caption" id="match-date-caption"></span></div><a class="text-button" id="schedule-link" href="/pages/schedule.html">경기 일정 전체 보기 <svg class="icon"><use href="/assets/icons/sprite.svg#arrow-right"/></svg></a></div>
+            <div class="match-cards" id="match-cards" aria-label="선택 날짜 경기 요약"></div>
+        </section>
+        <section class="preview-grid" aria-label="선택 경기 분석">
+            <article class="match-preview panel" id="featured-match"></article>
+            <article class="insights-panel panel" aria-labelledby="insights-title">
+                <div class="panel-heading"><h2 id="insights-title"><svg class="icon accent-text"><use href="/assets/icons/sprite.svg#spark"/></svg>승부를 가르는 숫자</h2><span class="micro-label">KEY FACTORS</span></div>
+                <div id="match-insights"></div>
+                <div class="insight-footnote"><svg class="icon"><use href="/assets/icons/sprite.svg#info"/></svg>분석 근거와 확률은 화면 확인용 예시입니다.</div>
+            </article>
+        </section>
+        <section class="overview-section" aria-labelledby="explore-title">
+            <div class="section-heading"><h2 id="explore-title">분석을 이어가세요</h2><span class="micro-label">EXPLORE THE GAME</span></div>
+            <div class="overview-links" id="overview-links"></div>
+        </section>
+    </main>
+    <noscript><div class="noscript-message">화면을 보려면 브라우저에서 JavaScript를 활성화해주세요.</div></noscript>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111312">
+    <meta name="description" content="COURTSIDE 남자 KBL 로컬 분석 워크스페이스 — 팀관리">
+    <title>팀관리 — COURTSIDE</title>
+    <link rel="icon" href="/assets/icons/court.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/components/team-trend.css">
+    <link rel="stylesheet" href="/css/components/standings-table.css">
+    <link rel="stylesheet" href="/css/components/records-table.css">
+    <link rel="stylesheet" href="/css/pages/team-management.css">
+    <script type="module" src="/js/pages/team-management.js"></script>
+</head>
+<body data-page="team-management">
+    <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
+    <main id="main-content">
+
+        <section class="page-heading" aria-labelledby="page-title">
+            <div><div class="eyebrow"><span class="small-line"></span>TEAM MANAGEMENT</div><h1 id="page-title">팀관리</h1><p>팀별 정보와 시즌 성적, 최근 경기 흐름을 확인하세요.</p></div>
+            <div class="team-picker"><label for="team-select">팀 선택</label><div class="select-wrap"><select id="team-select"></select><svg class="icon"><use href="/assets/icons/sprite.svg#chevron-down"/></svg></div></div>
+        </section>
+        <section class="team-identity-panel panel" id="team-identity" aria-label="선택 팀 정보"></section>
+        <div class="team-management-grid">
+            <section class="trend-panel panel" aria-labelledby="trend-title">
+                <div class="panel-heading"><div><h2 id="trend-title">최근 경기 흐름</h2><p class="panel-subtitle">득점과 실점의 간격에서 팀의 방향을 확인하세요.</p></div></div>
+                <div class="trend-toolbar"><div class="chart-legend"><span><i class="legend-dot scored"></i>득점</span><span><i class="legend-dot conceded"></i>실점</span></div><div class="segmented-control" role="group" aria-label="분석 경기 수"><button type="button" data-period="5" aria-pressed="false">최근 5경기</button><button type="button" data-period="10" aria-pressed="true" class="is-active">최근 10경기</button></div></div>
+                <div class="trend-chart" id="trend-chart"></div><div class="chart-detail" id="chart-detail" aria-live="polite"></div><div class="trend-summary" id="trend-summary"></div>
+            </section>
+            <section class="team-season-panel panel" aria-labelledby="team-season-title"><div class="panel-heading"><h2 id="team-season-title">시즌 성적</h2><span class="micro-label">SEASON REPORT</span></div><div id="team-season-summary"></div></section>
+        </div>
+        <section class="recent-games-panel panel" aria-labelledby="recent-games-title"><div class="panel-heading"><h2 id="recent-games-title">최근 경기 기록</h2><span class="section-caption">최신 경기부터 표시 · 예시 기록</span></div><div class="table-scroll"><table class="records-table"><caption class="sr-only">선택 팀의 최근 경기별 예시 득점과 실점</caption><thead><tr><th scope="col">날짜</th><th scope="col">상대 팀</th><th scope="col">득점</th><th scope="col">실점</th><th scope="col">득실 마진</th><th scope="col">결과</th></tr></thead><tbody id="recent-games-body"></tbody></table></div></section>
+    </main>
+    <noscript><div class="noscript-message">화면을 보려면 브라우저에서 JavaScript를 활성화해주세요.</div></noscript>
+</body>
+</html>

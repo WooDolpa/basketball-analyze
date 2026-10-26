@@ -1,0 +1,52 @@
+/* standings-table: 페이지와 독립적인 분석 위젯 스타일입니다. */
+.standings-panel { overflow: hidden; }
+.standings-panel .panel-heading { padding-bottom: 17px; }
+.table-scroll { overflow-x: auto; }
+.standings-table { width: 100%; border-collapse: collapse; text-align: center; white-space: nowrap; }
+.standings-table thead { background: #1d231b; }
+.standings-table th, .standings-table td { padding: 10px 4px; }
+.standings-table thead th { font-size: 8px; color: var(--subtle); font-weight: 400; border-block: 1px solid var(--border); }
+.standings-table thead th:nth-child(2) { text-align: left; padding-left: 7px; }
+.standings-table th:first-child, .standings-table td:first-child { padding-left: 18px; width: 45px; }
+.standings-table th:last-child, .standings-table td:last-child { padding-right: 19px; }
+.standings-table tbody td { font-family: var(--font-numeric); font-size: 11px; font-weight: 350; color: var(--muted); }
+.standings-table tbody tr { border-bottom: 1px solid var(--border-soft); }
+.standings-table tbody tr:last-child { border-bottom: 0; }
+.standings-table tbody tr.is-highlighted { background: #252f1d; }
+.standings-table tbody tr.is-highlighted td { color: var(--text-secondary); }
+.standings-table tbody tr:hover { background: #242c20; }
+.standings-table tbody th { font-weight: 400; text-align: left; }
+.rank-number { color: var(--muted); font-size: 10px; }
+.rank-number.top-rank { color: var(--accent); }
+.standings-team { display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 0 4px; white-space: nowrap; color: var(--muted); font-size: 10px; }
+.standings-team strong { color: var(--text-secondary); font-weight: 500; }
+.standings-team:hover strong { color: var(--accent); }
+.standings-table .win-rate { color: var(--text-secondary); }
+.form-dots { display: inline-flex; align-items: center; gap: 3px; }
+.form-dots i { width: 4px; height: 11px; border-radius: 2px; }
+.form-dots .win { background: #a4c96a; }
+.form-dots .loss { background: #3f4939; }
+.standings-table .playoff-cutoff { border-bottom: 1px dashed #5b6c43; }
+.table-footnote { display: flex; align-items: center; gap: 5px; padding: 12px 18px; border-top: 1px solid var(--border); color: var(--subtle); font-size: 7px; }
+.table-footnote > span:last-child { margin-left: auto; font-size: 7px; }
+.playoff-key { width: 9px; border-top: 1px dashed #8a9f63; }
+@media (min-width: 1600px) {
+    .standings-table th, .standings-table td { padding-block: 12px; }
+}
+@media (max-width: 760px) {
+    .standings-table th, .standings-table td { padding-block: 12px; }
+    .standings-team { font-size: 12px; }
+    .standings-table tbody td { font-size: 12px; }
+    .form-dots { gap: 4px; }
+    .form-dots i { width: 5px; }
+}
+@media (max-width: 480px) {
+    .standings-table th:first-child, .standings-table td:first-child { padding-left: 9px; }
+    .standings-table th:last-child, .standings-table td:last-child { padding-right: 10px; }
+    .standings-team { font-size: 10px; gap: 6px; }
+    .standings-table tbody td { font-size: 11px; }
+    .form-dots { gap: 3px; }
+    .form-dots i { width: 4px; }
+    .table-footnote { padding-inline: 12px; font-size: 7px; }
+    .table-footnote > span:last-child { font-size: 6px; }
+}

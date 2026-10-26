@@ -1,0 +1,15 @@
+/* 대시보드는 핵심 지표, 경기 프리뷰와 상세 페이지 진입 요약만 배치합니다. */
+.overview-section { margin-top: 28px; }
+.overview-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.overview-link { display: block; padding: 22px; transition: border-color .18s, background .18s; }
+.overview-link:hover { background: var(--surface-hover); border-color: #61704c; }
+.overview-link-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 11px; }
+.overview-link-top > span { display: inline-flex; align-items: center; gap: 9px; }
+.overview-link-top > .icon { width: 15px; height: 15px; color: var(--accent); }
+.overview-link > strong { display: block; margin-top: 23px; font-size: 17px; font-weight: 550; letter-spacing: -.5px; }
+.overview-link > p { margin-top: 7px; color: var(--muted); font-size: 10px; }
+@media (max-width: 760px) {
+    .overview-links { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .overview-link { padding: 19px; }
+    .overview-link > strong { margin-top: 14px; }
+}

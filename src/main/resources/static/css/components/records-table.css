@@ -1,0 +1,15 @@
+/* 팀 경기 기록과 선수 기록에서 공유하는 표 스타일입니다. */
+.records-table { width: 100%; min-width: 520px; border-collapse: collapse; text-align: center; white-space: nowrap; }
+.records-table th, .records-table td { padding: 15px 20px; border-bottom: 1px solid var(--border-soft); }
+.records-table thead { background: #1d231b; }
+.records-table thead th { color: var(--muted); font-size: 10px; font-weight: 400; }
+.records-table tbody th { color: var(--text-secondary); font-size: 12px; font-weight: 500; text-align: left; }
+.records-table tbody td { font-family: var(--font-numeric); font-size: 13px; color: var(--muted); }
+.records-table tr > :first-child { text-align: left; padding-left: 24px; }
+.records-table tr > :nth-child(2) { text-align: left; }
+.records-table tbody tr:hover { background: #242c20; }
+.records-table tbody tr:last-child > * { border-bottom: 0; }
+.records-table .is-sorted { color: var(--accent); }
+@media (max-width: 760px) {
+    .records-table th, .records-table td { padding: 13px 16px; }
+}

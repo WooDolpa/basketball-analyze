@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111312">
+    <meta name="description" content="COURTSIDE 남자 KBL 로컬 분석 워크스페이스 — 선수 기록">
+    <title>선수 기록 — COURTSIDE</title>
+    <link rel="icon" href="/assets/icons/court.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/components/player-leaders.css">
+    <link rel="stylesheet" href="/css/components/standings-table.css">
+    <link rel="stylesheet" href="/css/components/records-table.css">
+    <link rel="stylesheet" href="/css/pages/player-records.css">
+    <script type="module" src="/js/pages/player-records.js"></script>
+</head>
+<body data-page="player-records">
+    <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
+    <main id="main-content">
+
+        <section class="page-heading" aria-labelledby="page-title"><div><div class="eyebrow"><span class="small-line"></span>PLAYER SPOTLIGHT</div><h1 id="page-title">선수 기록</h1><p>코트를 빛내는 선수들, 기록으로 만나는 경기력.</p></div><span class="season-caption" id="season-caption"></span></section>
+        <section class="leaders-panel panel" aria-labelledby="leaders-title">
+            <div class="panel-heading"><div class="heading-group"><h2 id="leaders-title">시즌 리더</h2><span class="section-caption">경기당 평균 기록 · 예시</span></div><div class="segmented-control" role="group" aria-label="선수 순위 기준"><button type="button" data-leader="points" class="is-active" aria-pressed="true">득점</button><button type="button" data-leader="rebounds" aria-pressed="false">리바운드</button><button type="button" data-leader="assists" aria-pressed="false">어시스트</button></div></div>
+            <div class="player-leaders" id="player-leader-list"></div>
+        </section>
+        <section class="player-records-panel panel" aria-labelledby="records-title"><div class="panel-heading"><h2 id="records-title">선수별 기록</h2><span class="section-caption" id="records-sort-caption"></span></div><div class="table-scroll"><table class="records-table player-records-table"><caption class="sr-only">선택 지표 순으로 정렬한 예시 선수별 기록</caption><thead><tr><th scope="col">순위</th><th scope="col">선수</th><th scope="col">팀</th><th scope="col" data-stat="points">득점</th><th scope="col" data-stat="rebounds">리바운드</th><th scope="col" data-stat="assists">어시스트</th></tr></thead><tbody id="player-records-body"></tbody></table></div></section>
+    </main>
+    <noscript><div class="noscript-message">화면을 보려면 브라우저에서 JavaScript를 활성화해주세요.</div></noscript>
+</body>
+</html>

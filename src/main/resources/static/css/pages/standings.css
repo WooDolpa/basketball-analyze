@@ -1,0 +1,23 @@
+/* 전체 순위표는 독립 페이지의 너비를 활용해 여유 있게 표시합니다. */
+.standings-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 24px; }
+.standings-metrics .metric-card:first-child .metric-value { font-family: var(--font); font-size: 27px; }
+.season-caption { font-size: 11px; color: var(--muted); white-space: nowrap; }
+body[data-page="standings"] .standings-table th,
+body[data-page="standings"] .standings-table td { padding-block: 16px; }
+body[data-page="standings"] .standings-table tbody td { font-size: 14px; }
+body[data-page="standings"] .standings-team { font-size: 13px; gap: 13px; }
+body[data-page="standings"] .standings-table .team-badge { width: 29px; height: 29px; font-size: 10px; }
+body[data-page="standings"] .standings-table thead th { font-size: 10px; }
+body[data-page="standings"] .form-dots i { width: 6px; height: 16px; }
+body[data-page="standings"] .table-footnote { font-size: 9px; padding-block: 16px; }
+body[data-page="standings"] .table-footnote > span:last-child { font-size: 9px; }
+@media (max-width: 760px) {
+    .standings-metrics { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .standings-metrics .metric-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+    .standings-metrics .metric-top { grid-column: 1; }
+    .standings-metrics .metric-value { grid-column: 2; grid-row: 1 / 3; margin: 0; justify-content: flex-end; }
+    .standings-metrics .metric-bottom { grid-column: 1; }
+    body[data-page="standings"] .standings-table { min-width: 530px; }
+    body[data-page="standings"] .standings-team { font-size: 12px; }
+    body[data-page="standings"] .table-footnote { flex-wrap: wrap; row-gap: 7px; }
+}

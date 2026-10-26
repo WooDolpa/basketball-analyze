@@ -1,0 +1,7 @@
+/* 경기 일정 페이지의 목록과 상세 프리뷰 배치입니다. */
+.schedule-panel { margin-top: 10px; }
+.schedule-panel .match-cards { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+body[data-page="schedule"] .preview-grid { margin-top: 26px; }
+@media (max-width: 760px) {
+    .schedule-panel .match-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
