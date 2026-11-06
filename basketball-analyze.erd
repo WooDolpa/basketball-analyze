@@ -5,9 +5,9 @@
     "originX": 0,
     "originY": 0,
     "zoomLevel": 1,
-    "show": 431,
-    "database": 4,
-    "databaseName": "",
+    "show": 447,
+    "database": 1,
+    "databaseName": "basketball",
     "canvasType": "ERD",
     "language": 1,
     "tableNameCase": 4,
@@ -24,7 +24,11 @@
       64
     ],
     "maxWidthComment": -1,
-    "lockSettings": 63
+    "lockSettings": 63,
+    "ddlScripts": {
+      "before": "",
+      "after": "-- 경기 상태·결과·점수의 무결성 검사(MariaDB).\nALTER TABLE cc_season_match\n    ADD CONSTRAINT chk_cc_season_match_different_teams\n        CHECK (home_season_team_id <> away_season_team_id),\n    ADD CONSTRAINT chk_cc_season_match_status\n        CHECK (match_status IN ('SCHEDULED', 'LIVE', 'FINISHED', 'POSTPONED', 'CANCELLED')),\n    ADD CONSTRAINT chk_cc_season_match_win_type\n        CHECK (win_type IS NULL OR win_type IN ('HOME', 'AWAY')),\n    ADD CONSTRAINT chk_cc_season_match_nonnegative_scores\n        CHECK ((home_1q_score IS NULL OR home_1q_score >= 0)\n            AND (home_2q_score IS NULL OR home_2q_score >= 0)\n            AND (home_3q_score IS NULL OR home_3q_score >= 0)\n            AND (home_4q_score IS NULL OR home_4q_score >= 0)\n            AND (home_total_score IS NULL OR home_total_score >= 0)\n            AND (away_1q_score IS NULL OR away_1q_score >= 0)\n            AND (away_2q_score IS NULL OR away_2q_score >= 0)\n            AND (away_3q_score IS NULL OR away_3q_score >= 0)\n            AND (away_4q_score IS NULL OR away_4q_score >= 0)\n            AND (away_total_score IS NULL OR away_total_score >= 0)),\n    ADD CONSTRAINT chk_cc_season_match_result\n        CHECK (\n            (match_status = 'FINISHED'\n                AND home_total_score IS NOT NULL\n                AND away_total_score IS NOT NULL\n                AND win_type IS NOT NULL\n                AND ((home_total_score > away_total_score AND win_type = 'HOME')\n                    OR (away_total_score > home_total_score AND win_type = 'AWAY')))\n            OR (match_status <> 'FINISHED' AND win_type IS NULL)\n        );\n\nALTER TABLE cc_season_match_overtime\n    ADD CONSTRAINT chk_cc_season_match_overtime_no\n        CHECK (overtime_no >= 1),\n    ADD CONSTRAINT chk_cc_season_match_overtime_nonnegative_scores\n        CHECK ((home_score IS NULL OR home_score >= 0)\n            AND (away_score IS NULL OR away_score >= 0));\n\n-- 선수 경기 기록의 수치·집계 무결성 검사(MariaDB).\nALTER TABLE cc_season_match_player_record\n    ADD CONSTRAINT chk_match_player_record_nonnegative\n        CHECK ((playing_time_seconds IS NULL OR playing_time_seconds >= 0)\n            AND (points IS NULL OR points >= 0)\n            AND (offensive_rebounds IS NULL OR offensive_rebounds >= 0)\n            AND (defensive_rebounds IS NULL OR defensive_rebounds >= 0)\n            AND (rebounds IS NULL OR rebounds >= 0)\n            AND (assists IS NULL OR assists >= 0)\n            AND (steals IS NULL OR steals >= 0)\n            AND (blocks IS NULL OR blocks >= 0)\n            AND (turnovers IS NULL OR turnovers >= 0)\n            AND (fouls IS NULL OR fouls >= 0)\n            AND (field_goals_made IS NULL OR field_goals_made >= 0)\n            AND (field_goals_attempted IS NULL OR field_goals_attempted >= 0)\n            AND (two_pointers_made IS NULL OR two_pointers_made >= 0)\n            AND (two_pointers_attempted IS NULL OR two_pointers_attempted >= 0)\n            AND (three_pointers_made IS NULL OR three_pointers_made >= 0)\n            AND (three_pointers_attempted IS NULL OR three_pointers_attempted >= 0)\n            AND (free_throws_made IS NULL OR free_throws_made >= 0)\n            AND (free_throws_attempted IS NULL OR free_throws_attempted >= 0)),\n    ADD CONSTRAINT chk_match_player_record_shooting\n        CHECK ((field_goals_made IS NULL OR field_goals_attempted IS NULL OR field_goals_made <= field_goals_attempted)\n            AND (two_pointers_made IS NULL OR two_pointers_attempted IS NULL OR two_pointers_made <= two_pointers_attempted)\n            AND (three_pointers_made IS NULL OR three_pointers_attempted IS NULL OR three_pointers_made <= three_pointers_attempted)\n            AND (free_throws_made IS NULL OR free_throws_attempted IS NULL OR free_throws_made <= free_throws_attempted)),\n    ADD CONSTRAINT chk_match_player_record_field_goals_made\n        CHECK (field_goals_made IS NULL OR two_pointers_made IS NULL OR three_pointers_made IS NULL\n            OR field_goals_made = two_pointers_made + three_pointers_made),\n    ADD CONSTRAINT chk_match_player_record_field_goals_attempted\n        CHECK (field_goals_attempted IS NULL OR two_pointers_attempted IS NULL OR three_pointers_attempted IS NULL\n            OR field_goals_attempted = two_pointers_attempted + three_pointers_attempted),\n    ADD CONSTRAINT chk_match_player_record_rebounds\n        CHECK (rebounds IS NULL OR offensive_rebounds IS NULL OR defensive_rebounds IS NULL\n            OR rebounds = offensive_rebounds + defensive_rebounds),\n    ADD CONSTRAINT chk_match_player_record_starter\n        CHECK (is_starter IS NULL OR is_starter IN (0, 1)),\n    ADD CONSTRAINT chk_match_player_record_data_status\n        CHECK (data_status IN ('Y', 'N', 'D'));"
+    }
   },
   "doc": {
     "tableIds": [
@@ -32,11 +36,30 @@
       "03h49wkcotl5wiqz01xlmhxqi",
       "03h49wxbhlcwqrzfvnotas8v9",
       "03h4agd0em54n2hffx9ms0mll",
-      "03h4b08gho5thk9v5s2kp49r7"
+      "03h4b08gho5thk9v5s2kp49r7",
+      "03h6nuubqlpi0zz1qf6q9b3mj",
+      "03hmatchfix000000000000009",
+      "03hplayerrecord0000000001"
     ],
     "relationshipIds": [
       "03h4aggl0ecn3n4jeffqsuzq0",
-      "03h4agqgyfmhto4gexo0vxa3v"
+      "03h4agqgyfmhto4gexo0vxa3v",
+      "03h6maoji436521b5o0ck3lkl",
+      "03h6mp1rkyi7sc1ha6pmo486x",
+      "03h6nv2055sga2qpmtelvoxp7",
+      "03hmatchfix000000000000007",
+      "03hmatchfix000000000000008",
+      "03hmatchfix000000000000016",
+      "03hplayerrecord0000000028",
+      "03hplayerrecord0000000029"
+    ],
+    "indexIds": [
+      "03hmatchfix000000000000004",
+      "03hplayerrecord0000000030"
+    ],
+    "memoIds": [
+      "03hmatchfix000000000000017",
+      "03hplayerrecord0000000033"
     ]
   },
   "collections": {
@@ -90,13 +113,14 @@
           "03h4adhan3ixm41jgobbwiw90",
           "03h4adwy2zvff1cz2tta6hog6",
           "03h4ae21q0mh3d50kyvemda6z",
+          "03h6mnea0jkvvmksub0ruw9l9",
           "03h4ae8k3cab5v6lp0izrb0a0",
           "03h4ae8xp2cpuwjdu2g13ah9v",
           "03h4ae8xp2cpuwjdu2i65srk1"
         ],
         "ui": {
-          "x": -370.623,
-          "y": -795.6477
+          "x": -365.623,
+          "y": -799.6477
         }
       },
       "03h4agd0em54n2hffx9ms0mll": {
@@ -126,11 +150,119 @@
         "name": "cc_season_team_roster",
         "comment": "시즌 팀 로스터",
         "columnIds": [
-          "03h4b0avcumizvtmdzpcwpgej"
+          "03h6maojht48im6gjsn03kfn0",
+          "03h6mp1rksyhuxlis8hyzm8e3",
+          "03h6mp91zctfyr8rh2r0d33w0",
+          "03h6ml3cyfd7pm91g6xp6msmq",
+          "03hrosterstats000000000001",
+          "03hrosterstats000000000002",
+          "03hrosterstats000000000003",
+          "03hrosterstats000000000004",
+          "03hrosterstats000000000005",
+          "03hrosterstats000000000006",
+          "03hrosterstats000000000007",
+          "03hrosterstats000000000008",
+          "03hrosterstats000000000009",
+          "03hrosterstats000000000010",
+          "03hrosterstats000000000011",
+          "03hrosterstats000000000012",
+          "03hrosterstats000000000013",
+          "03hrosterstats000000000014",
+          "03hrosterstats000000000015",
+          "03hrosterstats000000000016",
+          "03hrosterstats000000000017",
+          "03hrosterstats000000000018",
+          "03hrosterstats000000000019"
         ],
         "ui": {
-          "x": -1520.0219,
-          "y": -738.6614
+          "x": -1104.8641,
+          "y": -667.9772
+        }
+      },
+      "03h6nuubqlpi0zz1qf6q9b3mj": {
+        "id": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "cc_season_match",
+        "comment": "시즌경기",
+        "columnIds": [
+          "03h6nuybix5w2rzbdl56of0id",
+          "03hmatchfix000000000000001",
+          "03h6nv204uqxvk6eznb3yw11x",
+          "03hmatchfix000000000000002",
+          "03hmatchfix000000000000003",
+          "03h6nv0v23m5v1el9aze5ocya",
+          "03h6nvbfwcpcuan6yi64ap2h1",
+          "03h6nvdnqrp0ycfbnsubfitve",
+          "03h6nvty43fvpu7lwocnzxa85",
+          "03h6nw1zr5vqxqxw0sx828yxy",
+          "03h6nw3nlf4pp7drrgcayujw1",
+          "03h6nw50qb07togi2rkcehj1h",
+          "03h6nvhyixv5u8fw6ubv8d9xg",
+          "03h6nwxfgaff8zy6ia6ggpp3w",
+          "03h6nwxkjmr854ss5y47ft7i8",
+          "03h6nwxkjmr854ss5y5u3vbyz",
+          "03h6nwxkjmr854ss5y7yf545d",
+          "03h6nvqpwan476l1ymag4r7kn",
+          "03h6nx80s5plwmpa9gimqx1ax",
+          "03h6nx8sqckeysfslg2e1k6cz",
+          "03h6nx8sqckeysfslg3sj8kyu"
+        ],
+        "ui": {
+          "x": -465,
+          "y": -2108.9772
+        }
+      },
+      "03hmatchfix000000000000009": {
+        "id": "03hmatchfix000000000000009",
+        "name": "cc_season_match_overtime",
+        "comment": "시즌 경기 연장 차수별 점수",
+        "columnIds": [
+          "03hmatchfix000000000000010",
+          "03hmatchfix000000000000011",
+          "03hmatchfix000000000000012",
+          "03hmatchfix000000000000013",
+          "03hmatchfix000000000000014",
+          "03hmatchfix000000000000015"
+        ],
+        "ui": {
+          "x": 1100,
+          "y": -2108.9772
+        }
+      },
+      "03hplayerrecord0000000001": {
+        "id": "03hplayerrecord0000000001",
+        "name": "cc_season_match_player_record",
+        "comment": "경기별 선수 개인기록(연장 포함)",
+        "columnIds": [
+          "03hplayerrecord0000000002",
+          "03hplayerrecord0000000003",
+          "03hplayerrecord0000000004",
+          "03hplayerrecord0000000005",
+          "03hplayerrecord0000000006",
+          "03hplayerrecord0000000007",
+          "03hplayerrecord0000000008",
+          "03hplayerrecord0000000009",
+          "03hplayerrecord0000000010",
+          "03hplayerrecord0000000011",
+          "03hplayerrecord0000000012",
+          "03hplayerrecord0000000013",
+          "03hplayerrecord0000000014",
+          "03hplayerrecord0000000015",
+          "03hplayerrecord0000000016",
+          "03hplayerrecord0000000017",
+          "03hplayerrecord0000000018",
+          "03hplayerrecord0000000019",
+          "03hplayerrecord0000000020",
+          "03hplayerrecord0000000021",
+          "03hplayerrecord0000000022",
+          "03hplayerrecord0000000023",
+          "03hplayerrecord0000000024",
+          "03hplayerrecord0000000025",
+          "03hplayerrecord0000000026",
+          "03hplayerrecord0000000027"
+        ],
+        "ui": {
+          "x": 1100,
+          "y": -900
         }
       }
     },
@@ -237,7 +369,7 @@
         "name": "id",
         "comment": "선수 아이디",
         "dataType": "VARCHAR(5)",
-        "options": 8
+        "options": 10
       },
       "03h4aa5p1zynr0g2awa5qrnpu": {
         "id": "03h4aa5p1zynr0g2awa5qrnpu",
@@ -292,7 +424,7 @@
         "tableId": "03h49wxbhlcwqrzfvnotas8v9",
         "name": "height",
         "comment": "키",
-        "dataType": "DECIMAL(3,2)",
+        "dataType": "DECIMAL(5,2)",
         "options": 8
       },
       "03h4ae21q0mh3d50kyvemda6z": {
@@ -300,7 +432,7 @@
         "tableId": "03h49wxbhlcwqrzfvnotas8v9",
         "name": "weight",
         "comment": "몸무게",
-        "dataType": "DECIMAL(3,2)",
+        "dataType": "DECIMAL(5,2)",
         "options": 0
       },
       "03h4ae8k3cab5v6lp0izrb0a0": {
@@ -335,6 +467,15 @@
         "dataType": "VARCHAR(128)",
         "options": 0
       },
+      "03h6mnea0jkvvmksub0ruw9l9": {
+        "id": "03h6mnea0jkvvmksub0ruw9l9",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "name": "retirement",
+        "comment": "은퇴여부",
+        "dataType": "BOOLEAN",
+        "default": "FALSE",
+        "options": 8
+      },
       "03h4aggl08w5bmhep1f6rm9ar": {
         "id": "03h4aggl08w5bmhep1f6rm9ar",
         "tableId": "03h4agd0em54n2hffx9ms0mll",
@@ -357,7 +498,7 @@
         "name": "id",
         "comment": "시즌 팀 아이디(시즌 아이디 + 팀아이디)",
         "dataType": "VARCHAR(12)",
-        "options": 8
+        "options": 10
       },
       "03h4avfaq8aypuwsegwm1kw4l": {
         "id": "03h4avfaq8aypuwsegwm1kw4l",
@@ -396,7 +537,7 @@
         "tableId": "03h4agd0em54n2hffx9ms0mll",
         "name": "games_behind",
         "comment": "승차",
-        "dataType": "DECIMAL(2,1)",
+        "dataType": "DECIMAL(3,1)",
         "options": 8
       },
       "03h4awo7y961qglmwmepqdkx6": {
@@ -423,9 +564,615 @@
         "dataType": "TIMESTAMP",
         "options": 0
       },
-      "03h4b0avcumizvtmdzpcwpgej": {
-        "id": "03h4b0avcumizvtmdzpcwpgej",
+      "03h6maojht48im6gjsn03kfn0": {
+        "id": "03h6maojht48im6gjsn03kfn0",
         "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "cc_season_team_id",
+        "comment": "시즌 팀 아이디(시즌 아이디 + 팀아이디)",
+        "dataType": "VARCHAR(12)",
+        "options": 10
+      },
+      "03h6ml3cyfd7pm91g6xp6msmq": {
+        "id": "03h6ml3cyfd7pm91g6xp6msmq",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "injury",
+        "comment": "부상여부",
+        "dataType": "BOOLEAN",
+        "default": "FALSE",
+        "options": 8
+      },
+      "03h6mp1rksyhuxlis8hyzm8e3": {
+        "id": "03h6mp1rksyhuxlis8hyzm8e3",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "cc_player_id",
+        "comment": "선수 아이디",
+        "dataType": "VARCHAR(5)",
+        "options": 10
+      },
+      "03h6mp91zctfyr8rh2r0d33w0": {
+        "id": "03h6mp91zctfyr8rh2r0d33w0",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "transfer",
+        "comment": "이적여부",
+        "dataType": "BOOLEAN",
+        "default": "FALSE",
+        "options": 8
+      },
+      "03hrosterstats000000000001": {
+        "id": "03hrosterstats000000000001",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "game_count",
+        "comment": "해당 시즌 소속팀 출전 경기 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hrosterstats000000000002": {
+        "id": "03hrosterstats000000000002",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "playing_time_seconds",
+        "comment": "해당 시즌 소속팀 누적 출전시간(초)",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000003": {
+        "id": "03hrosterstats000000000003",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "points",
+        "comment": "해당 시즌 소속팀 누적 득점",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000004": {
+        "id": "03hrosterstats000000000004",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "offensive_rebounds",
+        "comment": "해당 시즌 소속팀 누적 공격 리바운드",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000005": {
+        "id": "03hrosterstats000000000005",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "defensive_rebounds",
+        "comment": "해당 시즌 소속팀 누적 수비 리바운드",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000006": {
+        "id": "03hrosterstats000000000006",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "rebounds",
+        "comment": "해당 시즌 소속팀 누적 전체 리바운드",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000007": {
+        "id": "03hrosterstats000000000007",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "assists",
+        "comment": "해당 시즌 소속팀 누적 어시스트",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000008": {
+        "id": "03hrosterstats000000000008",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "steals",
+        "comment": "해당 시즌 소속팀 누적 스틸",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000009": {
+        "id": "03hrosterstats000000000009",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "blocks",
+        "comment": "해당 시즌 소속팀 누적 블록",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000010": {
+        "id": "03hrosterstats000000000010",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "turnovers",
+        "comment": "해당 시즌 소속팀 누적 턴오버",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000011": {
+        "id": "03hrosterstats000000000011",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "fouls",
+        "comment": "해당 시즌 소속팀 누적 파울",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000012": {
+        "id": "03hrosterstats000000000012",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "field_goals_made",
+        "comment": "해당 시즌 소속팀 누적 전체 야투 성공 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000013": {
+        "id": "03hrosterstats000000000013",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "field_goals_attempted",
+        "comment": "해당 시즌 소속팀 누적 전체 야투 시도 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000014": {
+        "id": "03hrosterstats000000000014",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "two_pointers_made",
+        "comment": "해당 시즌 소속팀 누적 2점슛 성공 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000015": {
+        "id": "03hrosterstats000000000015",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "two_pointers_attempted",
+        "comment": "해당 시즌 소속팀 누적 2점슛 시도 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000016": {
+        "id": "03hrosterstats000000000016",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "three_pointers_made",
+        "comment": "해당 시즌 소속팀 누적 3점슛 성공 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000017": {
+        "id": "03hrosterstats000000000017",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "three_pointers_attempted",
+        "comment": "해당 시즌 소속팀 누적 3점슛 시도 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000018": {
+        "id": "03hrosterstats000000000018",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "free_throws_made",
+        "comment": "해당 시즌 소속팀 누적 자유투 성공 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hrosterstats000000000019": {
+        "id": "03hrosterstats000000000019",
+        "tableId": "03h4b08gho5thk9v5s2kp49r7",
+        "name": "free_throws_attempted",
+        "comment": "해당 시즌 소속팀 누적 자유투 시도 수",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03h6nuybix5w2rzbdl56of0id": {
+        "id": "03h6nuybix5w2rzbdl56of0id",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "id",
+        "comment": "시즌경기 아이디",
+        "dataType": "INT",
+        "options": 11
+      },
+      "03h6nv0v23m5v1el9aze5ocya": {
+        "id": "03h6nv0v23m5v1el9aze5ocya",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "home_season_team_id",
+        "comment": "홈팀 시즌 팀 아이디(경기와 동일 시즌)",
+        "dataType": "VARCHAR(12)",
+        "options": 8
+      },
+      "03h6nv204uqxvk6eznb3yw11x": {
+        "id": "03h6nv204uqxvk6eznb3yw11x",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "cc_season_id",
+        "comment": "시즌 아이디",
+        "dataType": "VARCHAR(9)",
+        "options": 8
+      },
+      "03h6nvbfwcpcuan6yi64ap2h1": {
+        "id": "03h6nvbfwcpcuan6yi64ap2h1",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "away_season_team_id",
+        "comment": "원정팀 시즌 팀 아이디(경기와 동일 시즌)",
+        "dataType": "VARCHAR(12)",
+        "options": 8
+      },
+      "03h6nvdnqrp0ycfbnsubfitve": {
+        "id": "03h6nvdnqrp0ycfbnsubfitve",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "win_type",
+        "comment": "승리팀(HOME, AWAY), 경기 종료 전 NULL",
+        "dataType": "VARCHAR(4)",
+        "options": 0
+      },
+      "03h6nvhyixv5u8fw6ubv8d9xg": {
+        "id": "03h6nvhyixv5u8fw6ubv8d9xg",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "home_total_score",
+        "comment": "홈팀 점수(진행 중 현재 점수, 종료 시 연장 포함 최종점수), 미확인 NULL",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03h6nvqpwan476l1ymag4r7kn": {
+        "id": "03h6nvqpwan476l1ymag4r7kn",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "away_total_score",
+        "comment": "원정팀 점수(진행 중 현재 점수, 종료 시 연장 포함 최종점수), 미확인 NULL",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03h6nvty43fvpu7lwocnzxa85": {
+        "id": "03h6nvty43fvpu7lwocnzxa85",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "home_1q_score",
+        "comment": "홈팀 1쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nw1zr5vqxqxw0sx828yxy": {
+        "id": "03h6nw1zr5vqxqxw0sx828yxy",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "home_2q_score",
+        "comment": "홈팀 2쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nw3nlf4pp7drrgcayujw1": {
+        "id": "03h6nw3nlf4pp7drrgcayujw1",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "home_3q_score",
+        "comment": "홈팀 3쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nw50qb07togi2rkcehj1h": {
+        "id": "03h6nw50qb07togi2rkcehj1h",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "home_4q_score",
+        "comment": "홈팀 4쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nwxfgaff8zy6ia6ggpp3w": {
+        "id": "03h6nwxfgaff8zy6ia6ggpp3w",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "away_1q_score",
+        "comment": "원정팀 1쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nwxkjmr854ss5y47ft7i8": {
+        "id": "03h6nwxkjmr854ss5y47ft7i8",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "away_2q_score",
+        "comment": "원정팀 2쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nwxkjmr854ss5y5u3vbyz": {
+        "id": "03h6nwxkjmr854ss5y5u3vbyz",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "away_3q_score",
+        "comment": "원정팀 3쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nwxkjmr854ss5y7yf545d": {
+        "id": "03h6nwxkjmr854ss5y7yf545d",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "away_4q_score",
+        "comment": "원정팀 4쿼터 점수(미진행·미확인 NULL)",
+        "dataType": "TINYINT(2)",
+        "options": 0
+      },
+      "03h6nx80s5plwmpa9gimqx1ax": {
+        "id": "03h6nx80s5plwmpa9gimqx1ax",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "data_status",
+        "comment": "데이터 상태 (Y : 사용, N : 미사용, D : 삭제) ",
+        "dataType": "CHAR(1)",
+        "options": 8
+      },
+      "03h6nx8sqckeysfslg2e1k6cz": {
+        "id": "03h6nx8sqckeysfslg2e1k6cz",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03h6nx8sqckeysfslg3sj8kyu": {
+        "id": "03h6nx8sqckeysfslg3sj8kyu",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03hmatchfix000000000000001": {
+        "id": "03hmatchfix000000000000001",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "match_code",
+        "comment": "KBL 경기 코드(재수집 중복 방지)",
+        "dataType": "VARCHAR(30)",
+        "options": 12
+      },
+      "03hmatchfix000000000000002": {
+        "id": "03hmatchfix000000000000002",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "match_datetime",
+        "comment": "예정 경기 시작 일시(KST), 일시 미정 NULL",
+        "dataType": "DATETIME",
+        "options": 0
+      },
+      "03hmatchfix000000000000003": {
+        "id": "03hmatchfix000000000000003",
+        "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+        "name": "match_status",
+        "comment": "경기 상태(SCHEDULED: 예정, LIVE: 진행, FINISHED: 종료, POSTPONED: 연기, CANCELLED: 취소)",
+        "dataType": "VARCHAR(10)",
+        "options": 8,
+        "default": "'SCHEDULED'"
+      },
+      "03hmatchfix000000000000010": {
+        "id": "03hmatchfix000000000000010",
+        "tableId": "03hmatchfix000000000000009",
+        "name": "cc_season_match_id",
+        "comment": "시즌경기 아이디",
+        "dataType": "INT",
+        "options": 10
+      },
+      "03hmatchfix000000000000011": {
+        "id": "03hmatchfix000000000000011",
+        "tableId": "03hmatchfix000000000000009",
+        "name": "overtime_no",
+        "comment": "연장 차수(1부터 시작)",
+        "dataType": "SMALLINT",
+        "options": 10
+      },
+      "03hmatchfix000000000000012": {
+        "id": "03hmatchfix000000000000012",
+        "tableId": "03hmatchfix000000000000009",
+        "name": "home_score",
+        "comment": "해당 연장의 홈팀 점수(미확인 NULL)",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hmatchfix000000000000013": {
+        "id": "03hmatchfix000000000000013",
+        "tableId": "03hmatchfix000000000000009",
+        "name": "away_score",
+        "comment": "해당 연장의 원정팀 점수(미확인 NULL)",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hmatchfix000000000000014": {
+        "id": "03hmatchfix000000000000014",
+        "tableId": "03hmatchfix000000000000009",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03hmatchfix000000000000015": {
+        "id": "03hmatchfix000000000000015",
+        "tableId": "03hmatchfix000000000000009",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03hplayerrecord0000000002": {
+        "id": "03hplayerrecord0000000002",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "cc_season_match_id",
+        "comment": "시즌경기 아이디",
+        "dataType": "INT",
+        "options": 10
+      },
+      "03hplayerrecord0000000003": {
+        "id": "03hplayerrecord0000000003",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "cc_player_id",
+        "comment": "선수 아이디",
+        "dataType": "VARCHAR(5)",
+        "options": 10
+      },
+      "03hplayerrecord0000000004": {
+        "id": "03hplayerrecord0000000004",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "cc_season_team_id",
+        "comment": "경기 당시 소속 시즌 팀 아이디",
+        "dataType": "VARCHAR(12)",
+        "options": 8
+      },
+      "03hplayerrecord0000000005": {
+        "id": "03hplayerrecord0000000005",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "is_starter",
+        "comment": "선발 출전 여부(미확인 NULL)",
+        "dataType": "BOOLEAN",
+        "options": 0
+      },
+      "03hplayerrecord0000000006": {
+        "id": "03hplayerrecord0000000006",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "playing_time_seconds",
+        "comment": "해당 경기 전체 출전시간(초, 연장 포함)",
+        "dataType": "INT",
+        "options": 0
+      },
+      "03hplayerrecord0000000007": {
+        "id": "03hplayerrecord0000000007",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "points",
+        "comment": "해당 경기 득점",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000008": {
+        "id": "03hplayerrecord0000000008",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "offensive_rebounds",
+        "comment": "해당 경기 공격 리바운드",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000009": {
+        "id": "03hplayerrecord0000000009",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "defensive_rebounds",
+        "comment": "해당 경기 수비 리바운드",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000010": {
+        "id": "03hplayerrecord0000000010",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "rebounds",
+        "comment": "해당 경기 전체 리바운드",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000011": {
+        "id": "03hplayerrecord0000000011",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "assists",
+        "comment": "해당 경기 어시스트",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000012": {
+        "id": "03hplayerrecord0000000012",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "steals",
+        "comment": "해당 경기 스틸",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000013": {
+        "id": "03hplayerrecord0000000013",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "blocks",
+        "comment": "해당 경기 블록",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000014": {
+        "id": "03hplayerrecord0000000014",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "turnovers",
+        "comment": "해당 경기 턴오버",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000015": {
+        "id": "03hplayerrecord0000000015",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "fouls",
+        "comment": "해당 경기 파울",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000016": {
+        "id": "03hplayerrecord0000000016",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "field_goals_made",
+        "comment": "해당 경기 전체 야투 성공 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000017": {
+        "id": "03hplayerrecord0000000017",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "field_goals_attempted",
+        "comment": "해당 경기 전체 야투 시도 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000018": {
+        "id": "03hplayerrecord0000000018",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "two_pointers_made",
+        "comment": "해당 경기 2점슛 성공 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000019": {
+        "id": "03hplayerrecord0000000019",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "two_pointers_attempted",
+        "comment": "해당 경기 2점슛 시도 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000020": {
+        "id": "03hplayerrecord0000000020",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "three_pointers_made",
+        "comment": "해당 경기 3점슛 성공 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000021": {
+        "id": "03hplayerrecord0000000021",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "three_pointers_attempted",
+        "comment": "해당 경기 3점슛 시도 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000022": {
+        "id": "03hplayerrecord0000000022",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "free_throws_made",
+        "comment": "해당 경기 자유투 성공 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000023": {
+        "id": "03hplayerrecord0000000023",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "free_throws_attempted",
+        "comment": "해당 경기 자유투 시도 수",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000024": {
+        "id": "03hplayerrecord0000000024",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "plus_minus",
+        "comment": "해당 선수 출전 중 팀 득실 마진(음수 허용)",
+        "dataType": "SMALLINT",
+        "options": 0
+      },
+      "03hplayerrecord0000000025": {
+        "id": "03hplayerrecord0000000025",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "data_status",
+        "comment": "데이터 상태(Y: 사용, N: 미사용, D: 삭제)",
+        "dataType": "CHAR(1)",
+        "options": 8
+      },
+      "03hplayerrecord0000000026": {
+        "id": "03hplayerrecord0000000026",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "created_date",
+        "comment": "등록일",
+        "dataType": "TIMESTAMP",
+        "options": 0
+      },
+      "03hplayerrecord0000000027": {
+        "id": "03hplayerrecord0000000027",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "modified_date",
+        "comment": "수정일",
+        "dataType": "TIMESTAMP",
         "options": 0
       }
     },
@@ -464,6 +1211,226 @@
           "columnIds": [
             "03h4agqgya0vvsmo5x0wq65jk"
           ]
+        }
+      },
+      "03h6maoji436521b5o0ck3lkl": {
+        "id": "03h6maoji436521b5o0ck3lkl",
+        "relationshipType": 16,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h4agd0em54n2hffx9ms0mll",
+          "columnIds": [
+            "03h4agxv468lunavq4mp3cujq"
+          ]
+        },
+        "end": {
+          "tableId": "03h4b08gho5thk9v5s2kp49r7",
+          "columnIds": [
+            "03h6maojht48im6gjsn03kfn0"
+          ]
+        }
+      },
+      "03h6mp1rkyi7sc1ha6pmo486x": {
+        "id": "03h6mp1rkyi7sc1ha6pmo486x",
+        "relationshipType": 16,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+          "columnIds": [
+            "03h49wy930xd0ehfmtzx5kajd"
+          ]
+        },
+        "end": {
+          "tableId": "03h4b08gho5thk9v5s2kp49r7",
+          "columnIds": [
+            "03h6mp1rksyhuxlis8hyzm8e3"
+          ]
+        }
+      },
+      "03h6nv2055sga2qpmtelvoxp7": {
+        "id": "03h6nv2055sga2qpmtelvoxp7",
+        "relationshipType": 16,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h49b4u6f2jjp2829hmj3mls",
+          "columnIds": [
+            "03h49b6j40p0xcauq9tu2ndb6"
+          ]
+        },
+        "end": {
+          "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+          "columnIds": [
+            "03h6nv204uqxvk6eznb3yw11x"
+          ]
+        }
+      },
+      "03hmatchfix000000000000007": {
+        "id": "03hmatchfix000000000000007",
+        "relationshipType": 4,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h4agd0em54n2hffx9ms0mll",
+          "columnIds": [
+            "03h4aggl08w5bmhep1f6rm9ar",
+            "03h4agxv468lunavq4mp3cujq"
+          ]
+        },
+        "end": {
+          "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+          "columnIds": [
+            "03h6nv204uqxvk6eznb3yw11x",
+            "03h6nv0v23m5v1el9aze5ocya"
+          ]
+        }
+      },
+      "03hmatchfix000000000000008": {
+        "id": "03hmatchfix000000000000008",
+        "relationshipType": 4,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h4agd0em54n2hffx9ms0mll",
+          "columnIds": [
+            "03h4aggl08w5bmhep1f6rm9ar",
+            "03h4agxv468lunavq4mp3cujq"
+          ]
+        },
+        "end": {
+          "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+          "columnIds": [
+            "03h6nv204uqxvk6eznb3yw11x",
+            "03h6nvbfwcpcuan6yi64ap2h1"
+          ]
+        }
+      },
+      "03hmatchfix000000000000016": {
+        "id": "03hmatchfix000000000000016",
+        "relationshipType": 4,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+          "columnIds": [
+            "03h6nuybix5w2rzbdl56of0id"
+          ]
+        },
+        "end": {
+          "tableId": "03hmatchfix000000000000009",
+          "columnIds": [
+            "03hmatchfix000000000000010"
+          ]
+        }
+      },
+      "03hplayerrecord0000000028": {
+        "id": "03hplayerrecord0000000028",
+        "relationshipType": 4,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h6nuubqlpi0zz1qf6q9b3mj",
+          "columnIds": [
+            "03h6nuybix5w2rzbdl56of0id"
+          ]
+        },
+        "end": {
+          "tableId": "03hplayerrecord0000000001",
+          "columnIds": [
+            "03hplayerrecord0000000002"
+          ]
+        }
+      },
+      "03hplayerrecord0000000029": {
+        "id": "03hplayerrecord0000000029",
+        "relationshipType": 4,
+        "onDelete": 1,
+        "onUpdate": 1,
+        "start": {
+          "tableId": "03h4b08gho5thk9v5s2kp49r7",
+          "columnIds": [
+            "03h6maojht48im6gjsn03kfn0",
+            "03h6mp1rksyhuxlis8hyzm8e3"
+          ]
+        },
+        "end": {
+          "tableId": "03hplayerrecord0000000001",
+          "columnIds": [
+            "03hplayerrecord0000000004",
+            "03hplayerrecord0000000003"
+          ]
+        }
+      }
+    },
+    "indexEntities": {
+      "03hmatchfix000000000000004": {
+        "id": "03hmatchfix000000000000004",
+        "name": "uq_cc_season_team_season_id",
+        "tableId": "03h4agd0em54n2hffx9ms0mll",
+        "indexColumnIds": [
+          "03hmatchfix000000000000005",
+          "03hmatchfix000000000000006"
+        ],
+        "unique": true
+      },
+      "03hplayerrecord0000000030": {
+        "id": "03hplayerrecord0000000030",
+        "name": "idx_match_player_record_player_match",
+        "tableId": "03hplayerrecord0000000001",
+        "indexColumnIds": [
+          "03hplayerrecord0000000031",
+          "03hplayerrecord0000000032"
+        ],
+        "unique": false
+      }
+    },
+    "indexColumnEntities": {
+      "03hmatchfix000000000000005": {
+        "id": "03hmatchfix000000000000005",
+        "indexId": "03hmatchfix000000000000004",
+        "columnId": "03h4aggl08w5bmhep1f6rm9ar",
+        "orderType": 1
+      },
+      "03hmatchfix000000000000006": {
+        "id": "03hmatchfix000000000000006",
+        "indexId": "03hmatchfix000000000000004",
+        "columnId": "03h4agxv468lunavq4mp3cujq",
+        "orderType": 1
+      },
+      "03hplayerrecord0000000031": {
+        "id": "03hplayerrecord0000000031",
+        "indexId": "03hplayerrecord0000000030",
+        "columnId": "03hplayerrecord0000000003",
+        "orderType": 1
+      },
+      "03hplayerrecord0000000032": {
+        "id": "03hplayerrecord0000000032",
+        "indexId": "03hplayerrecord0000000030",
+        "columnId": "03hplayerrecord0000000002",
+        "orderType": 1
+      }
+    },
+    "memoEntities": {
+      "03hmatchfix000000000000017": {
+        "id": "03hmatchfix000000000000017",
+        "value": "경기 저장 규칙\n• match_datetime은 한국시간(KST). 경기 일시가 미정이면 NULL.\n• 점수의 NULL은 미진행·미확인, 0은 확인된 무득점.\n• FINISHED에서만 승리팀을 저장하고 최종점수와 일치시킨다.\n• 진행 중 total_score는 현재 누적점수, 종료 시에는 연장을 포함한 최종점수.\n• 연장전은 경기 ID + 연장 차수 복합 PK로 저장한다. 연장이 없으면 행을 만들지 않는다.\n• 최종점수와 1~4쿼터 및 연장 점수 합계의 대조는 수집·저장 로직에서 처리한다.\n• 홈·원정팀은 서로 달라야 하며, 복합 FK로 경기와 동일 시즌 팀만 연결한다.\n• 상태·결과·음수 점수 검사는 설정의 DDL 후처리 SQL에 정의했다.",
+        "ui": {
+          "x": 1100,
+          "y": -1508.9771999999998,
+          "width": 900,
+          "height": 400
+        }
+      },
+      "03hplayerrecord0000000033": {
+        "id": "03hplayerrecord0000000033",
+        "value": "선수 경기 기록 저장 규칙\n• 1행은 선수 1명의 경기 전체 기록이며 연장 기록을 포함한다.\n• 경기 ID + 선수 ID 복합 PK로 같은 경기의 중복 기록을 방지한다.\n• 시즌 팀 ID + 선수 ID는 시즌 팀 로스터를 참조한다.\n• 기록 미확인은 NULL, 확인된 무기록은 0으로 저장한다. 선발 여부도 미확인 시 NULL.\n• 출전 여부는 API의 출전 정보를 기준으로 판단하며 출전시간 0만으로 미출전을 단정하지 않는다.\n• 경기 당시 소속팀이 해당 경기의 홈팀 또는 원정팀인지 향후 수집·저장 로직에서 검증한다.\n• 해당 경기와 소속팀의 시즌 일치도 함께 검증한다. 수집·저장 로직은 아직 미구현.\n• 음수 기록(득실 마진 제외), 슈팅 성공·시도, 야투·리바운드 합계는 DDL 후처리 CHECK로 검사한다.\n• 경기일·상대팀·홈원정은 경기 테이블에서 조회하고, 슈팅 성공률은 성공·시도로 계산한다.",
+        "ui": {
+          "x": 2300,
+          "y": -900,
+          "width": 950,
+          "height": 430
         }
       }
     }
