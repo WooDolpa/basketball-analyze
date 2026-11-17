@@ -1,0 +1,13 @@
+spring:
+  config:
+    import: file:./docker/.env[.properties]
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:${MARIADB_PORT:3307}/${MARIADB_DATABASE}
+    username: ${MARIADB_USER}
+    password: ${MARIADB_PASSWORD}
+  flyway:
+    enabled: true
+
+logging:
+  level:
+    org.hibernate.orm.connections.pooling: WARN

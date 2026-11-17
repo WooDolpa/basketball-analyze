@@ -1,0 +1,54 @@
+# 로컬 MariaDB 실행·백업·복원
+
+Docker·백업·복원 명령은 `docker/` 폴더에서 실행합니다. Docker Desktop의 Linux 엔진과 Compose가 필요합니다. 백업·복원은 PowerShell 7.4 이상을 사용합니다.
+
+## 시작
+
+1. 저장소 루트에서 `Set-Location docker`를 실행합니다. 새 PC에서는 `.env.example`을 `.env`로 복사하고 `MARIADB_PASSWORD`와 `MARIADB_ROOT_PASSWORD`에 서로 다른 비밀번호를 입력합니다. Docker Compose와 Spring Boot가 같은 파일을 읽으므로 따옴표 없이 영문·숫자로 된 긴 비밀번호를 사용합니다.
+2. 아래 명령으로 컨테이너를 시작합니다. JDBC 접속 주소는 기본 `jdbc:mariadb://127.0.0.1:3307/basketball`입니다. 포트 충돌이 있으면 `.env`의 `MARIADB_PORT`만 변경합니다.
+
+```powershell
+docker compose up -d --wait
+docker compose ps
+```
+
+3. 새 빈 DB를 초기화하려면 저장소 루트로 돌아가 JDK 25로 앱을 실행합니다. 기존 SQL 백업이 있으면 먼저 아래 복원 절차를 진행합니다.
+
+```powershell
+Set-Location ..
+.\gradlew.bat bootRun --args="--spring.profiles.active=docker"
+```
+
+IntelliJ에서는 저장소 루트를 작업 디렉터리로 지정하고 `docker` 프로필을 사용합니다. 해당 실행 설정에는 기존 원격 DB용 `-DMARIADB_*` 옵션을 빼고 `docker/.env`에서 접속 정보를 읽게 합니다.
+
+Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 차례대로 적용합니다. `V1`에는 ERD의 8개 테이블과 제약조건이 포함되어 있습니다. 적용한 마이그레이션은 보존하고 다음 스키마 변경을 `V2__설명.sql`처럼 새 파일에 기록합니다.
+
+컨테이너를 종료하려면 `docker compose stop`을 실행합니다. 데이터는 Docker의 `mariadb-data` 볼륨에 유지됩니다.
+
+## 비밀번호 변경과 빈 DB 초기화
+
+- 기존 DB를 유지할 때는 MariaDB 계정 비밀번호를 먼저 바꾸고, `docker/.env`의 해당 비밀번호를 같은 값으로 수정합니다. `docker/`에서 `docker compose up -d --wait`를 실행한 뒤 앱을 다시 시작합니다.
+- DB를 새로 만들 때는 빈 볼륨으로 시작하면 `.env`에 입력한 비밀번호로 계정이 생성됩니다. `docker compose down -v`는 해당 프로젝트의 DB 볼륨과 데이터를 삭제합니다. 보존할 데이터가 있다면 먼저 SQL로 백업합니다. 새 볼륨을 만든 뒤 앱을 시작하면 Flyway가 스키마를 적용합니다.
+
+## 백업
+
+마이그레이션이 실행 중이지 않을 때 `docker/`에서 아래 명령을 사용합니다. DB 테이블과 데이터, `flyway_schema_history`가 SQL 파일에 들어갑니다. 기본 저장 위치는 `docker/backups/`입니다.
+
+```powershell
+.\db.ps1 Backup
+```
+
+경로를 지정하려면 `Backup` 뒤에 SQL 파일 경로를 넘깁니다. `.env`와 기본 백업 폴더는 Git에서 제외됩니다. PC를 옮길 때는 사용할 Git 버전을 새 PC에서 체크아웃하고 SQL 파일을 별도로 옮깁니다.
+
+## 새 PC에서 복원
+
+1. 새 PC의 `docker/`에서 `.env`를 구성하고 `docker compose up -d --wait`를 실행합니다. 애플리케이션은 복원이 끝난 뒤 시작합니다.
+2. 빈 `basketball` DB에 백업을 복원합니다.
+
+```powershell
+.\db.ps1 Restore 'C:\path\to\basketball-20261117-150000.sql'
+```
+
+3. 저장소 루트에서 앱을 `docker` 프로필로 실행합니다. 복원된 Flyway 이력을 기준으로 이후 버전만 적용됩니다.
+
+복원 스크립트는 이미 테이블이 있는 DB에서 작업을 중단합니다. 복원 중 오류가 발생해 일부 테이블이 생성됐다면 오류 원인을 해결한 뒤 새 빈 볼륨에서 다시 시도합니다. 기존 데이터를 보존해야 하는 볼륨은 별도로 백업합니다.

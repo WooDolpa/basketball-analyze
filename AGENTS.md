@@ -54,6 +54,6 @@ History contains only brief setup messages (`first commit`, `기본설정`), wit
 
 ## Security & Configuration Tips
 
-Set `MARIADB_URL` to `localhost:3306/basketball` or the actual host, port, and database; the YAML already supplies `jdbc:mariadb://`. Also provide `MARIADB_USERNAME` and `MARIADB_PASSWORD` through the process environment or IDE run configuration. Never commit credentials. Provision schema changes explicitly because `ddl-auto` is `none`. No `compose.yaml` is checked in despite the configuration comment.
+For the local `docker` profile, follow [로컬 MariaDB 실행·백업·복원](docker/README.md). For the default profile, set `MARIADB_URL` to `host:port/database` and provide `MARIADB_USERNAME` and `MARIADB_PASSWORD` through the process environment or IDE run configuration. Never commit credentials. Hibernate uses `ddl-auto: none`. The `docker` profile applies schema versions through Flyway.
 
 API 조사 수치의 기준일은 2026-10-26입니다. 최근 5시즌은 진행 중인 2026–2027시즌을 포함한 2022–2023~2026–2027 정규리그이며, 조사 결과를 이미 구현된 수집 기능으로 표현하지 않습니다. 선수·팀 코드는 문자열로 보존하고, 최신 프로필의 소속팀을 과거 시즌 소속으로 사용하지 않습니다.

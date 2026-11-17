@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### 로컬 MariaDB ###
+/docker/.env
+/docker/backups/

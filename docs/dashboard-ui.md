@@ -39,10 +39,10 @@ src/main/resources/static/
 
 ## 실행
 
-기존 DB 환경변수를 설정하고 Spring Boot를 실행한 뒤 `http://localhost:9000/`에 접속합니다.
+[로컬 MariaDB 실행 안내](../docker/README.md)에 따라 DB를 시작한 뒤 저장소 루트에서 Spring Boot를 `docker` 프로필로 실행하고 `http://localhost:9000/`에 접속합니다.
 
 ```powershell
-.\gradlew.bat bootRun
+.\gradlew.bat bootRun --args="--spring.profiles.active=docker"
 ```
 
 Python이 설치된 환경에서는 저장소 루트에서 아래 명령으로 DB 연결 없이 화면만 확인할 수도 있습니다.
