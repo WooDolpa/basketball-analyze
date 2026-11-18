@@ -1,10 +1,10 @@
 # 데이터 저장 설계와 승부예측 준비 상태
 
-정리 기준일은 **2026-11-17**입니다. 설계 원본은 [basketball-analyze.erd](../basketball-analyze.erd)입니다. 최근 5시즌 전수 조사는 2026-10-26 기준이며, 첫 적재용 표본은 2026-11-17에 재확인했습니다. [API 조사](kbl-api-data.md)
+정리 기준일은 **2026-11-18**입니다. 설계 원본은 [basketball-analyze.erd](../basketball-analyze.erd)입니다. 최근 5시즌 전수 조사는 2026-10-26 기준입니다. [API 조사](kbl-api-data.md)
 
 ## 반영 범위와 구현 상태
 
-ERD의 테이블·컬럼·관계를 Flyway `V1`으로 Docker의 로컬 MariaDB에 적용했습니다. KBL 데이터 적재, Entity·수집기·업무 API·예측 모델 구현은 미진행입니다.
+ERD의 테이블·컬럼·관계를 Flyway `V1`으로 Docker의 로컬 MariaDB에 적용했습니다. 2026–2027 정규리그의 시즌·구단·시즌별 순위·경기 일정과 결과는 수집 API와 JDBC를 통해 개발 DB에 적재했습니다. 선수·로스터·경기별 선수 기록·연장 점수는 적재 전입니다. [개발 DB 적재와 백업 결과](project-status.md#개발-db-적재와-백업-결과)
 
 ERD의 `settings.ddlScripts.after`에 있는 `CHECK` 제약조건을 [초기 마이그레이션](../src/main/resources/db/migration/V1__create_basketball_schema.sql)에 포함했습니다. JPA의 `ddl-auto`는 `none`이며, `docker` 프로필에서 Flyway가 스키마를 적용합니다. [로컬 DB 실행 안내](../docker/README.md)
 
@@ -24,13 +24,13 @@ ERD의 `settings.ddlScripts.after`에 있는 `CHECK` 제약조건을 [초기 마
 ### 공통 식별·단위·결측 규칙
 
 - 선수·팀 외부 코드는 문자열로 보존합니다. `cc_player.id`는 `VARCHAR(5)`인 내부 키, `cc_player.code`는 `VARCHAR(6)`인 외부 선수 코드이므로 구분합니다. 팀 코드도 앞자리 0을 유지합니다.
-- `cc_season_team.id`는 시즌 ID와 팀 ID를 조합하는 `VARCHAR(12)` 키입니다. 조합·외부 시즌 코드 매핑은 수집 구현 시 명확히 정의해야 합니다.
+- `cc_season_team.id`는 시즌 ID와 팀 ID를 이어 붙인 `VARCHAR(12)` 키입니다. 수집 코드에서 KBL 정규리그 키 `S49G01`을 내부 시즌 ID `2026-2027`로 매핑합니다.
 - 선수 키·몸무게는 `DECIMAL(5,2)`이며 cm·kg 단위로 저장하는 방향입니다. 승차는 `DECIMAL(3,1)`입니다.
 - 출전시간은 초 단위 정수입니다. 날짜·시각의 변환 규칙을 통일하고 `match_datetime`은 한국시간(KST)으로 다룹니다.
 - 기록 미진행·미확인은 `NULL`, 확인된 무기록은 `0`으로 구분합니다. 미확인 선발 여부를 `FALSE`로 채우지 않습니다.
 - `data_status`는 사용·미사용·삭제 상태이며 경기 진행 상태·부상 상태와 별개입니다.
 - 현재 로스터의 `injury`, `transfer`와 선수의 `retirement`는 기본값 `FALSE`입니다. 외부 자료로 확인되지 않은 값을 정상 출전·이적 없음·활동 중의 확정 근거로 사용하지 않습니다. 미확인 상태 표현과 시점 이력은 보완 대상입니다.
-- 첫 적재 계획에서는 KBL의 `winRate`를 0~1 비율로 받아 `cc_season_team.win_percentage`의 기존 `DECIMAL(3,2)`에 맞춰 소수점 둘째 자리까지 저장합니다. 예를 들어 `0.78571429`는 `0.79`로 저장합니다. [첫 데이터 적재 계획](project-status.md#첫-데이터-적재-계획)
+- 순위 수집 API는 KBL의 `winRate`를 0~1 비율로 받아 `cc_season_team.win_percentage`의 `DECIMAL(3,2)`에 맞춰 소수점 둘째 자리까지 저장합니다. 예를 들어 `0.78571429`는 `0.79`로 저장합니다. [수집·저장 API](project-status.md#첫-데이터-적재)
 
 ## 시즌별 선수 누적 기록
 
@@ -72,7 +72,7 @@ ERD의 `settings.ddlScripts.after`에 있는 `CHECK` 제약조건을 [초기 마
 | `data_status` | `CHAR(1)` | 데이터 상태, NOT NULL |
 | `created_date`, `modified_date` | `TIMESTAMP` | 등록·수정일 |
 
-진행 상태는 `SCHEDULED`(예정), `LIVE`(진행), `FINISHED`(종료), `POSTPONED`(연기), `CANCELLED`(취소)를 사용합니다. API 원본 상태 코드와의 변환 규칙은 아직 구현하지 않았습니다.
+KBL의 `isStarted`, `isEnded`가 각각 `0, 0`이면 `SCHEDULED`(예정), `1, 0`이면 `LIVE`(진행), `1, 1`이면 `FINISHED`(종료)로 저장합니다. `POSTPONED`(연기)와 `CANCELLED`(취소)는 원본에서 별도로 식별할 수 있는 값의 검증이 필요합니다.
 
 최종점수는 128점 이상을 담을 수 있도록 `SMALLINT`로 조정했습니다. `TINYINT(3)`의 표시 폭은 저장 범위를 늘리지 않습니다.
 
@@ -190,10 +190,10 @@ KBL의 부상·당일 출전 정보 제공 여부는 기존 조사에서 미확�
 
 ### 다음 검토 순서
 
-1. 시즌·팀·시즌 팀 순위와 경기 일정·결과를 로컬 DB에 적재하고 KBL 원본과 대조합니다.
-2. 확보한 기록으로 날짜 단위 Elo 모델을 검토하고, 오늘 예정 경기의 승률과 이유를 화면에 표시합니다.
-3. 확장이 필요할 때 예측 시점·입력 스냅샷, 경기별 팀 기록, 예측 결과와 정정 이력의 범위를 정합니다.
-4. 확보 가능한 출처에 맞춰 선수 출전 상태·소속 기간·추가 맥락을 확장합니다.
+1. 개발 DB에서 오늘 예정 경기를 읽는 조회 API를 설계하고 화면을 연결합니다.
+2. 적재한 팀별 승패 기록으로 날짜 단위 Elo 모델을 검토하고, 오늘 예정 경기의 승률과 이유를 화면에 표시합니다.
+3. 선수 기록 화면에 실제 데이터를 붙일 때 선수 기본 정보, 시즌별 로스터, 경기별 선수 기록을 적재합니다. 연장 점수는 경기 상세 데이터와 함께 수집합니다.
+4. 예측 범위를 확장할 때 예측 시점·입력 스냅샷, 경기별 팀 기록, 예측 결과와 정정 이력의 범위를 정합니다.
 
 평가는 날짜순으로 진행하고 적중률과 함께 Brier 점수·Log Loss로 승률의 품질도 확인하는 방향입니다. 학습 시즌·변수·가중치·평가 구간·모델은 아직 확정하거나 구현하지 않았습니다. [확률 평가 안내](https://sklearn.org/stable/modules/calibration.html)
 
@@ -201,4 +201,4 @@ KBL의 부상·당일 출전 정보 제공 여부는 기존 조사에서 미확�
 
 - ERD 작업에서 공식 JSON 스키마, 컬럼·FK·인덱스 참조, 변경 범위와 diff 검사를 수행했습니다.
 - Flyway `V1`을 적용하고 MariaDB에서 테이블 8개, PK 8개, FK 10개, `CHECK` 14개가 등록된 것을 확인했습니다.
-- SQL 백업을 빈 DB에 복원해 스키마와 Flyway 이력을 대조했습니다.
+- 첫 적재 후 SQL 백업을 별도 DB에 복원해 테이블 8개의 행 수와 Flyway `V1` 이력을 대조했습니다.
