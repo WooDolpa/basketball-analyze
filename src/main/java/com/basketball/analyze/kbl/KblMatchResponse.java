@@ -9,7 +9,8 @@ import java.util.List;
 public record KblMatchResponse(
         String seasonId,
         @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDate date,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, without = JsonFormat.Feature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "uuuu-MM-dd'T'HH:mm:ssXXX",
+                timezone = "Asia/Seoul")
         OffsetDateTime queriedAt,
         List<Match> matches
 ) {
@@ -17,7 +18,8 @@ public record KblMatchResponse(
     public record Match(
             int id,
             String matchCode,
-            @JsonFormat(shape = JsonFormat.Shape.STRING, without = JsonFormat.Feature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "uuuu-MM-dd'T'HH:mm:ssXXX",
+                    timezone = "Asia/Seoul")
             OffsetDateTime startsAt,
             String status,
             Team homeTeam,
