@@ -76,18 +76,32 @@ class KblClient {
                 .build(), new ParameterizedTypeReference<>() {});
     }
 
-    /** 응답 배열을 읽고 KBL 통신·역직렬화 실패를 502로 전달합니다. */
-    private <T> List<T> fetch(String description, Function<UriBuilder, URI> uri, ParameterizedTypeReference<List<T>> type) {
-        List<T> rows;
-        try {
-            rows = client.get().uri(uri).retrieve().body(type);
-        } catch (RestClientException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "KBL " + description + " 조회에 실패했습니다.", exception);
+    /** 경기 코드 한 건의 상세 정보와 홈·원정 쿼터 점수를 읽습니다. */
+    GameDetail fetchGameDetail(String matchCode) {
+        GameDetail detail = request("경기 " + matchCode + " 상세",
+                uri -> uri.path("/match/{matchCode}").build(matchCode), new ParameterizedTypeReference<>() {});
+        if (detail == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "KBL 경기 " + matchCode + " 상세 응답이 비었습니다.");
         }
+        return detail;
+    }
+
+    /** KBL 목록 응답에 배열과 유효한 행이 들어 있는지 확인합니다. */
+    private <T> List<T> fetch(String description, Function<UriBuilder, URI> uri, ParameterizedTypeReference<List<T>> type) {
+        List<T> rows = request(description, uri, type);
         if (rows == null || rows.stream().anyMatch(row -> row == null)) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "KBL " + description + " 응답 배열이 올바르지 않습니다.");
         }
         return rows;
+    }
+
+    /** 공통 KBL 요청을 보내고 통신·역직렬화 실패를 502로 전달합니다. */
+    private <T> T request(String description, Function<UriBuilder, URI> uri, ParameterizedTypeReference<T> type) {
+        try {
+            return client.get().uri(uri).retrieve().body(type);
+        } catch (RestClientException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "KBL " + description + " 조회에 실패했습니다.", exception);
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -118,5 +132,30 @@ class KblClient {
             Integer isEnded,
             @JsonProperty("scoreH") Integer homeScore,
             @JsonProperty("scoreA") Integer awayScore
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record GameDetail(DetailGame game, @JsonProperty("teamrecords") TeamPeriodRecords teamRecords) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record DetailGame(
+            @JsonProperty("glkey") String leagueKey,
+            @JsonProperty("gmkey") String code,
+            @JsonProperty("tcodeH") String homeTeamCode,
+            @JsonProperty("tcodeA") String awayTeamCode,
+            Integer isStarted,
+            Integer isEnded
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record TeamPeriodRecords(TeamPeriods home, TeamPeriods away) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record TeamPeriods(
+            @JsonProperty("scoreq1") Integer firstQuarter,
+            @JsonProperty("scoreq2") Integer secondQuarter,
+            @JsonProperty("scoreq3") Integer thirdQuarter,
+            @JsonProperty("scoreq4") Integer fourthQuarter,
+            @JsonProperty("scoreeq") List<Integer> overtime
     ) {}
 }

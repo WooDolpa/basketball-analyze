@@ -1,7 +1,12 @@
 package com.basketball.analyze.kbl;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -24,10 +29,12 @@ import static com.basketball.analyze.kbl.KblSyncRepository.MatchStatus.SCHEDULED
 @Service
 class KblSyncService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(KblSyncService.class);
     private static final String LEAGUE_KEY = "S49G01";
     private static final String SEASON_ID = "2026-2027";
     private static final int GAME_QUERY_DAYS = 31;
     private static final int MAX_REQUEST_DAYS = 366;
+    private static final int MIN_DATABASE_YEAR = 1000;
     private static final BigDecimal MAX_GAMES_BEHIND = new BigDecimal("99.9");
     private static final DateTimeFormatter GAME_TIME = DateTimeFormatter.ofPattern("HHmm")
             .withResolverStyle(ResolverStyle.STRICT);
@@ -131,6 +138,99 @@ class KblSyncService {
         return new SyncResult(fetchedCount, matches.size());
     }
 
+    /** 기간 내 종료 경기를 순서대로 수집하고 각 경기의 실패를 기록한 뒤 다음 경기를 처리합니다. */
+    synchronized QuarterRangeSyncResult syncMatchQuartersInRange(String leagueKey, String from, String to) {
+        requireSupportedLeague(leagueKey);
+        LocalDate fromDate = parseRequestDate(from);
+        LocalDate toDate = parseRequestDate(to);
+        if (fromDate.isAfter(toDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromDate는 toDate보다 늦을 수 없습니다.");
+        }
+        if (fromDate.getYear() < MIN_DATABASE_YEAR) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "날짜의 연도는 1000년 이상이어야 합니다.");
+        }
+
+        List<String> matchCodes = repository.findFinishedMatchCodes(SEASON_ID, fromDate, toDate);
+        List<QuarterSyncFailure> failures = new ArrayList<>();
+        for (String matchCode : matchCodes) {
+            try {
+                syncMatchQuarters(matchCode);
+            } catch (ResponseStatusException exception) {
+                failures.add(new QuarterSyncFailure(matchCode, exception.getStatusCode().value(), exception.getReason()));
+            } catch (DataAccessException | TransactionException exception) {
+                LOGGER.error("경기 {}의 쿼터 점수 DB 처리에 실패했습니다.", matchCode, exception);
+                failures.add(new QuarterSyncFailure(matchCode, HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "쿼터 점수 데이터베이스 처리에 실패했습니다."));
+            }
+        }
+        return new QuarterRangeSyncResult(SEASON_ID, fromDate, toDate, matchCodes.size(),
+                matchCodes.size() - failures.size(), failures.size(), List.copyOf(failures));
+    }
+
+    /** 적재된 종료 경기의 상세를 검증하고 홈·원정 1~4쿼터의 점수를 저장합니다. */
+    synchronized QuarterSyncResult syncMatchQuarters(String matchCode) {
+        if (matchCode.length() > 30 || !matchCode.matches(LEAGUE_KEY + "N[0-9]+")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "경기 코드는 " + LEAGUE_KEY + "N29와 같은 2026–2027 정규리그 경기 코드로 입력해 주세요.");
+        }
+        if (!repository.hasFinishedMatch(SEASON_ID, matchCode)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "경기 " + matchCode
+                    + "의 종료 결과가 없습니다. 경기 종료 후 경기 수집 API(POST /api/kbl/seasons/"
+                    + LEAGUE_KEY + "/matches/sync)를 먼저 호출해 주세요.");
+        }
+
+        KblClient.GameDetail detail = client.fetchGameDetail(matchCode);
+        KblClient.DetailGame game = detail.game();
+        if (game == null || !matchCode.equals(game.code()) || !LEAGUE_KEY.equals(game.leagueKey())
+                || !Integer.valueOf(1).equals(game.isStarted()) || !Integer.valueOf(1).equals(game.isEnded())) {
+            throw invalidResponse("경기 " + matchCode + "의 경기 코드, 정규리그 또는 종료 상태를 확인할 수 없습니다.");
+        }
+        validateTeamCode(game.homeTeamCode(), "경기 " + matchCode + " 홈팀");
+        validateTeamCode(game.awayTeamCode(), "경기 " + matchCode + " 원정팀");
+
+        KblClient.TeamPeriodRecords records = detail.teamRecords();
+        if (records == null || records.home() == null || records.away() == null) {
+            throw invalidResponse("경기 " + matchCode + "의 양 팀 쿼터 점수가 누락되었습니다.");
+        }
+        KblClient.TeamPeriods home = records.home();
+        KblClient.TeamPeriods away = records.away();
+        List<KblSyncRepository.QuarterScore> quarters = List.of(
+                toQuarterScore(matchCode, 1, home.firstQuarter(), away.firstQuarter()),
+                toQuarterScore(matchCode, 2, home.secondQuarter(), away.secondQuarter()),
+                toQuarterScore(matchCode, 3, home.thirdQuarter(), away.thirdQuarter()),
+                toQuarterScore(matchCode, 4, home.fourthQuarter(), away.fourthQuarter()));
+        if (home.overtime() == null || away.overtime() == null || home.overtime().size() != away.overtime().size()) {
+            throw invalidResponse("경기 " + matchCode + "의 양 팀 연장 점수 배열이 올바르지 않습니다.");
+        }
+        int homeTotal = addOvertimeScores(matchCode, quarters.stream().mapToInt(KblSyncRepository.QuarterScore::homeScore).sum(),
+                home.overtime());
+        int awayTotal = addOvertimeScores(matchCode, quarters.stream().mapToInt(KblSyncRepository.QuarterScore::awayScore).sum(),
+                away.overtime());
+        repository.saveMatchQuarters(SEASON_ID, LEAGUE_KEY, new KblSyncRepository.MatchQuarters(
+                matchCode, game.homeTeamCode(), game.awayTeamCode(), homeTotal, awayTotal, quarters));
+        return new QuarterSyncResult(matchCode, quarters);
+    }
+
+    /** 쿼터 점수가 누락됐거나 DB 저장 범위를 벗어나면 저장 전에 응답을 거절합니다. */
+    private KblSyncRepository.QuarterScore toQuarterScore(String matchCode, int quarter, Integer homeScore, Integer awayScore) {
+        if (!within(homeScore, 0, Byte.MAX_VALUE) || !within(awayScore, 0, Byte.MAX_VALUE)) {
+            throw invalidResponse("경기 " + matchCode + "의 " + quarter + "쿼터 점수가 누락되었거나 올바르지 않습니다.");
+        }
+        return new KblSyncRepository.QuarterScore(quarter, homeScore, awayScore);
+    }
+
+    /** 연장 점수를 검증하고 정규 쿼터 합계에 더해 DB 최종점수와 대조할 값을 계산합니다. */
+    private int addOvertimeScores(String matchCode, int regulationScore, List<Integer> overtime) {
+        int total = regulationScore;
+        for (Integer score : overtime) {
+            if (!within(score, 0, Short.MAX_VALUE - total)) {
+                throw invalidResponse("경기 " + matchCode + "의 연장 점수가 누락되었거나 올바르지 않습니다.");
+            }
+            total += score;
+        }
+        return total;
+    }
+
     /** KBL 플래그로 경기 상태를 정하고 종료 경기의 승리팀을 점수에서 계산합니다. */
     private KblSyncRepository.Match toMatch(KblClient.Game game) {
         String target = "경기 " + game.code();
@@ -224,4 +324,21 @@ class KblSyncService {
     }
 
     record SyncResult(int fetchedCount, int processedCount) {}
+
+    /** 저장을 완료한 경기 코드와 1~4쿼터 점수를 반환합니다. */
+    record QuarterSyncResult(String matchCode, List<KblSyncRepository.QuarterScore> quarters) {}
+
+    /** 조회 기간과 대상·저장·실패 경기 수를 반환합니다. */
+    record QuarterRangeSyncResult(
+            String seasonId,
+            @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDate fromDate,
+            @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDate toDate,
+            int targetCount,
+            int savedCount,
+            int failedCount,
+            List<QuarterSyncFailure> failures
+    ) {}
+
+    /** 실패한 경기와 원인을 식별할 수 있는 상태 코드 및 상세 메시지를 담습니다. */
+    record QuarterSyncFailure(String matchCode, int status, String detail) {}
 }

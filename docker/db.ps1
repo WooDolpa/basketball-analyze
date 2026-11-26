@@ -1,4 +1,4 @@
-#Requires -Version 7.4
+﻿#Requires -Version 5.1
 [CmdletBinding()]
 param(
     [Parameter(Mandatory, Position = 0)]
@@ -10,14 +10,16 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$PSNativeCommandArgumentPassing = 'Standard'
-$PSNativeCommandUseErrorActionPreference = $false
+if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+    $PSNativeCommandUseErrorActionPreference = $false
+}
 
 $composeFile = Join-Path $PSScriptRoot 'compose.yaml'
 $envFile = Join-Path $PSScriptRoot '.env'
 $composeOptions = @('--project-directory', $PSScriptRoot, '--file', $composeFile, '--env-file', $envFile)
 $operationId = [Guid]::NewGuid().ToString('N')
 $containerFile = "/tmp/basketball-$operationId.sql"
+$containerScriptFile = "/tmp/basketball-$operationId.sh"
 
 # 저장소에 연결된 Compose 명령을 실행하고 실패 시 작업을 중단합니다.
 function Invoke-DbCompose {
@@ -26,6 +28,23 @@ function Invoke-DbCompose {
     & docker compose @composeOptions @Arguments
     if ($LASTEXITCODE -ne 0) {
         throw "Docker Compose 작업에 실패했습니다. 명령: $($Arguments[0]), 종료 코드: $LASTEXITCODE"
+    }
+}
+
+# 셸 명령을 UTF-8 파일로 전달해 PowerShell 버전에 따른 인용부호 처리를 피합니다.
+function Invoke-DbContainerScript {
+    param([string]$Script)
+
+    $hostScriptFile = Join-Path ([IO.Path]::GetTempPath()) "basketball-$operationId.sh"
+    try {
+        $shellScript = $Script.Replace([string][char]13, '') + "`n"
+        [IO.File]::WriteAllText($hostScriptFile, $shellScript, [Text.UTF8Encoding]::new($false))
+        Invoke-DbCompose @('cp', $hostScriptFile, "mariadb:${containerScriptFile}")
+        Invoke-DbCompose @('exec', '-T', 'mariadb', 'sh', '-e', $containerScriptFile, $containerFile)
+    } finally {
+        if (Test-Path -LiteralPath $hostScriptFile) {
+            Remove-Item -LiteralPath $hostScriptFile
+        }
     }
 }
 
@@ -48,7 +67,7 @@ mariadb-dump --user="$MARIADB_USER" --single-transaction --quick --skip-lock-tab
     --result-file="$1" "$MARIADB_DATABASE"
 '@
     try {
-        Invoke-DbCompose @('exec', '-T', 'mariadb', 'sh', '-ec', ($dumpCommand.Replace([string][char]13, '')), 'sh', $containerFile)
+        Invoke-DbContainerScript $dumpCommand
         Invoke-DbCompose @('cp', "mariadb:${containerFile}", $partialFile)
         [IO.File]::Move($partialFile, $Destination)
         Write-Output "백업 완료. $Destination"
@@ -78,7 +97,7 @@ fi
 mariadb --user="$MARIADB_USER" --database="$MARIADB_DATABASE" --default-character-set=utf8mb4 --binary-mode < "$1"
 '@
     Invoke-DbCompose @('cp', $Source, "mariadb:${containerFile}")
-    Invoke-DbCompose @('exec', '-T', 'mariadb', 'sh', '-ec', ($restoreCommand.Replace([string][char]13, '')), 'sh', $containerFile)
+    Invoke-DbContainerScript $restoreCommand
     Write-Output "복원 완료. $Source"
 }
 
@@ -94,7 +113,7 @@ if (-not (Test-Path -LiteralPath $envFile -PathType Leaf)) {
     throw 'docker/.env 파일을 먼저 구성하세요. docker/README.md를 참고하세요.'
 }
 
-$fullPath = [IO.Path]::GetFullPath($Path, (Get-Location).ProviderPath)
+$fullPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
 try {
     if ($Action -eq 'Backup') {
         Backup-Database $fullPath
@@ -102,7 +121,7 @@ try {
         Restore-Database $fullPath
     }
 } finally {
-    & docker compose @composeOptions exec -T mariadb rm -f -- $containerFile
+    & docker compose @composeOptions exec -T mariadb rm -f -- $containerFile $containerScriptFile
     if ($LASTEXITCODE -ne 0) {
         Write-Warning '컨테이너의 임시 SQL 파일을 정리하지 못했습니다.'
     }

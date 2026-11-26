@@ -7,13 +7,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Repository
 class KblSyncRepository {
+
+    private static final LocalTime LAST_DATABASE_TIME = LocalTime.MAX.truncatedTo(ChronoUnit.MICROS);
 
     private final JdbcTemplate jdbc;
 
@@ -108,6 +113,57 @@ class KblSyncRepository {
         }).toList());
     }
 
+    /** 한국시간 시작일과 종료일을 포함해 사용 상태인 종료 경기 코드를 시작 시각순으로 읽습니다. */
+    List<String> findFinishedMatchCodes(String seasonId, LocalDate fromDate, LocalDate toDate) {
+        return jdbc.queryForList("""
+                SELECT match_code FROM cc_season_match
+                WHERE cc_season_id = ? AND match_status = 'FINISHED' AND data_status = 'Y'
+                    AND match_datetime >= ? AND match_datetime <= ?
+                ORDER BY match_datetime, match_code
+                """, String.class, seasonId, fromDate.atStartOfDay(), toDate.atTime(LAST_DATABASE_TIME));
+    }
+
+    /** 쿼터 상세 조회에 앞서 현재 저장된 사용 상태의 종료 경기인지 확인합니다. */
+    boolean hasFinishedMatch(String seasonId, String matchCode) {
+        return Boolean.TRUE.equals(jdbc.queryForObject("""
+                SELECT EXISTS (
+                    SELECT 1 FROM cc_season_match
+                    WHERE cc_season_id = ? AND match_code = ? AND match_status = 'FINISHED' AND data_status = 'Y'
+                )
+                """, Boolean.class, seasonId, matchCode));
+    }
+
+    /** 경기 행을 잠근 뒤 홈·원정팀과 최종점수를 대조하고 1~4쿼터 점수를 갱신합니다. */
+    @Transactional
+    public void saveMatchQuarters(String seasonId, String leagueKey, MatchQuarters match) {
+        List<Integer> matchIds = jdbc.queryForList("""
+                SELECT id FROM cc_season_match
+                WHERE cc_season_id = ? AND match_code = ? AND match_status = 'FINISHED' AND data_status = 'Y'
+                    AND home_season_team_id = ? AND away_season_team_id = ?
+                    AND home_total_score = ? AND away_total_score = ?
+                FOR UPDATE
+                """, Integer.class, seasonId, match.matchCode(),
+                seasonId + match.homeTeamCode(), seasonId + match.awayTeamCode(), match.homeTotal(), match.awayTotal());
+        if (matchIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "경기 " + match.matchCode()
+                    + "의 팀, 종료 상태 또는 최종점수가 저장된 경기와 일치하지 않습니다. 경기 수집 API(POST /api/kbl/seasons/"
+                    + leagueKey + "/matches/sync)로 해당 경기를 갱신한 뒤 다시 호출해 주세요.");
+        }
+
+        QuarterScore first = match.quarters().getFirst();
+        QuarterScore second = match.quarters().get(1);
+        QuarterScore third = match.quarters().get(2);
+        QuarterScore fourth = match.quarters().get(3);
+        jdbc.update("""
+                UPDATE cc_season_match
+                SET home_1q_score = ?, away_1q_score = ?, home_2q_score = ?, away_2q_score = ?,
+                    home_3q_score = ?, away_3q_score = ?, home_4q_score = ?, away_4q_score = ?,
+                    modified_date = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """, first.homeScore(), first.awayScore(), second.homeScore(), second.awayScore(),
+                third.homeScore(), third.awayScore(), fourth.homeScore(), fourth.awayScore(), matchIds.getFirst());
+    }
+
     /** 선행 시즌 적재가 빠졌으면 호출할 API를 안내합니다. */
     private void requireSeason(String seasonId, String leagueKey) {
         Boolean exists = jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM cc_season WHERE id = ?)",
@@ -132,4 +188,17 @@ class KblSyncRepository {
             Integer homeScore,
             Integer awayScore
     ) {}
+
+    /** 기존 경기와 대조할 팀·최종점수와 실제로 저장할 정규 쿼터 점수를 담습니다. */
+    record MatchQuarters(
+            String matchCode,
+            String homeTeamCode,
+            String awayTeamCode,
+            int homeTotal,
+            int awayTotal,
+            List<QuarterScore> quarters
+    ) {}
+
+    /** 홈·원정의 한 쿼터 점수를 담습니다. */
+    record QuarterScore(int quarter, int homeScore, int awayScore) {}
 }

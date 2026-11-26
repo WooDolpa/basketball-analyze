@@ -32,6 +32,13 @@ function renderNavigation(pageId) {
 
 /** 공통 메뉴·상단 바·시즌 선택·안내창을 현재 페이지에 구성합니다. */
 export function mountAppShell(pageId, state, onSeasonChange) {
+    const isDashboard = pageId === 'dashboard';
+    const dataNotice = isDashboard
+        ? '오늘 예정 경기와 승률은 KBL 일정 및 Elo 예측을 사용합니다. 시즌 지표와 내보내기 리포트는 예시입니다.'
+        : '모든 경기·기록·예측은 UI 확인용 예시입니다. 실제 KBL 데이터 및 예측 모델은 연결되지 않았습니다.';
+    const guideDescription = isDashboard
+        ? '오늘 예정 경기의 카드를 선택하면 양 팀의 예상 승률과 Elo 예측 근거를 볼 수 있습니다. 화면의 시즌 지표는 예시입니다.'
+        : '현재 화면은 예시 데이터로 동작합니다. 예측 확률과 적중률은 실제 모델의 결과가 아닙니다.';
     const main = document.getElementById('main-content');
     const shell = document.createElement('div');
     shell.className = 'app-shell';
@@ -71,7 +78,7 @@ export function mountAppShell(pageId, state, onSeasonChange) {
                     <span class="breadcrumb">워크스페이스 <span>/</span> ${PAGES[pageId].parentLabel ? `<span>${PAGES[pageId].parentLabel}</span><span>/</span>` : ''}<strong>${PAGES[pageId].label}</strong></span>
                 </div>
                 <div class="topbar-actions">
-                    <span class="demo-badge"><span></span>예시 데이터</span><span class="topbar-divider"></span>
+                    <span class="demo-badge"><span></span>${isDashboard ? '일부 예시 데이터' : '예시 데이터'}</span><span class="topbar-divider"></span>
                     <button type="button" class="icon-button" id="guide-button" aria-label="화면 이용 안내">${icon('help')}</button>
                     <span class="user-avatar" aria-label="개인 워크스페이스">ME</span>
                 </div>
@@ -83,7 +90,7 @@ export function mountAppShell(pageId, state, onSeasonChange) {
     main.insertAdjacentHTML('beforeend', `
         <footer class="page-footer">
             <span><span class="status-dot"></span>개인 분석을 위한 로컬 워크스페이스</span>
-            <p>모든 경기·기록·예측은 UI 확인용 예시입니다. 실제 KBL 데이터 및 예측 모델은 연결되지 않았습니다.</p>
+            <p>${dataNotice}</p>
             <span class="footer-wordmark">COURTSIDE © 2026</span>
         </footer>`);
     document.body.insertAdjacentHTML('beforeend', `
@@ -92,7 +99,7 @@ export function mountAppShell(pageId, state, onSeasonChange) {
             <div class="dialog-heading"><span class="eyebrow">WELCOME TO COURTSIDE</span>
                 <button type="button" class="icon-button" id="guide-close" aria-label="안내 닫기">${icon('close')}</button></div>
             <h2 id="guide-title">코트를 읽는 작은 가이드</h2>
-            <p>현재 화면은 예시 데이터로 동작합니다. 예측 확률과 적중률은 실제 모델의 결과가 아닙니다.</p>
+            <p>${guideDescription}</p>
             <ol>
                 <li><strong>메뉴별 독립 페이지</strong><span>경기 일정·리그 순위·선수 기록으로 이동하거나, 팀 메뉴를 펼쳐 팀관리를 선택하세요.</span></li>
                 <li><strong>기록을 이어서 탐색</strong><span>순위표의 팀을 선택하면 해당 팀의 팀관리 화면으로 이동합니다. 시즌과 선택 설정은 페이지 간 유지됩니다.</span></li>

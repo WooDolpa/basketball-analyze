@@ -11,7 +11,7 @@
 
 ## Project Structure & Module Organization
 
-Java 25, Spring Boot 4.1.1, Gradle, Spring MVC, Spring Data JPA, MariaDB, QueryDSL 7.6 기반의 단일 모듈입니다. KBL 2026–2027 정규리그의 수집·저장 API 4개와 오늘 예정 경기·Elo 승률 조회 API 2개를 구현했습니다. DB 접근은 `JdbcTemplate`을 사용합니다. 정적 UI는 예시 데이터를 사용하며, 예정 경기의 Elo 계산값 검수와 대시보드 연동이 남아 있습니다.
+Java 25, Spring Boot 4.1.1, Gradle, Spring MVC, Spring Data JPA, MariaDB, QueryDSL 7.6 기반의 단일 모듈입니다. KBL 2026–2027 정규리그의 수집·저장 API 6개와 기간별 일정·오늘 예정 경기·Elo 예측 조회 API 3개를 구현했습니다. DB 접근은 `JdbcTemplate`을 사용합니다. 대시보드의 오늘 예정 경기 영역은 예측 API에 연결되어 있습니다. 실제 예정 경기의 Elo 검수와 경기 일정 화면 및 쿼터 점수 조회 연동이 남아 있습니다.
 
 - `src/main/java/com/basketball/analyze/`: application source; `Application.java` is the entry point. Keep new packages beneath this root for component scanning.
 - `src/main/java/com/basketball/analyze/kbl/`: KBL 수집 클라이언트, 수집·조회·예측 API와 서비스, JDBC 저장소.

@@ -1,6 +1,6 @@
 # 로컬 MariaDB 실행·백업·복원
 
-Docker·백업·복원 명령은 `docker/` 폴더에서 실행합니다. 실행 중인 Docker 엔진과 Docker Compose가 필요합니다. 백업·복원 스크립트 `db.ps1`은 PowerShell 7.4 이상에서 실행합니다.
+Docker·백업·복원 명령은 `docker/` 폴더에서 실행합니다. 실행 중인 Docker 엔진과 Docker Compose가 필요합니다. 백업·복원 스크립트 `db.ps1`은 Windows 기본 PowerShell 5.1과 PowerShell 7에서 실행할 수 있습니다.
 
 ## 시작
 
@@ -40,15 +40,28 @@ Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 �
 
 ## 백업
 
-마이그레이션이 실행 중이지 않을 때 `docker/`에서 아래 명령을 사용합니다. DB 테이블과 데이터, `flyway_schema_history`가 SQL 파일에 들어갑니다. 기본 저장 위치는 `docker/backups/`입니다.
+쿼터 적재처럼 백업에 담을 작업이 끝난 뒤 실행합니다. DB 테이블 정의·데이터·`flyway_schema_history`를 SQL 파일 하나에 저장합니다. 덤프가 끝날 때까지 Flyway 마이그레이션과 스키마 변경 작업을 기다립니다.
 
-```powershell
-.\db.ps1 Backup
-```
+1. Docker 엔진을 시작하고 저장소의 `docker/` 폴더로 이동합니다. `docker compose ps`에서 `mariadb`가 실행 중인지 확인합니다. 중지 상태면 `docker compose up -d --wait`로 시작합니다.
+2. 같은 폴더에서 Windows PowerShell을 열고 백업 스크립트를 실행합니다. `RemoteSigned` 실행 정책은 이 명령이 시작하는 프로세스에 적용됩니다.
 
-경로를 지정하려면 `Backup` 뒤에 SQL 파일 경로를 넘깁니다. `.env`와 기본 백업 폴더는 Git에서 제외됩니다. PC를 옮길 때는 사용할 Git 버전을 새 PC에서 체크아웃하고 SQL 파일을 별도로 옮깁니다.
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\db.ps1 Backup
+   ```
 
-Mac에서 2026-11-25에 재적재한 DB의 백업 파일은 `docker/backups/basketball-20261125-232448.sql`입니다. 별도 MariaDB에서 복원을 검수했습니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
+   Windows PowerShell에서 이미 로컬 스크립트 실행을 허용한다면 `.\db.ps1 Backup`으로 실행할 수 있습니다. macOS 터미널에서는 `pwsh -NoProfile -File ./db.ps1 Backup`을 실행합니다.
+
+3. `백업 완료.` 메시지에 나온 파일 경로를 확인합니다. 기본 파일명은 `docker/backups/basketball-YYYYMMDD-HHmmss.sql`입니다. PowerShell에서 최신 백업의 경로·크기·수정 시각을 확인합니다.
+
+   ```powershell
+   Get-ChildItem ./backups -Filter 'basketball-*.sql' -File |
+       Sort-Object LastWriteTime -Descending |
+       Select-Object -First 1 FullName, Length, LastWriteTime
+   ```
+
+별도 경로를 쓰려면 `Backup` 뒤에 새 SQL 파일 경로를 넘깁니다. `.env`와 기본 백업 폴더는 Git에서 제외됩니다. PC를 옮길 때는 사용할 Git 버전을 새 PC에서 체크아웃하고, SQL 파일을 별도로 복사한 뒤 새 PC의 `.env`를 구성합니다.
+
+2026-11-25 Mac 재적재 직후 만든 백업은 `docker/backups/basketball-20261125-232448.sql`입니다. 그 파일은 별도 MariaDB에 복원해 검수했습니다. 11월 26일에 적재한 쿼터 점수 74건을 담으려면 위 절차로 현재 DB를 새로 백업합니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
 
 ## 새 PC에서 복원
 
@@ -56,7 +69,7 @@ Mac에서 2026-11-25에 재적재한 DB의 백업 파일은 `docker/backups/bask
 2. 빈 `basketball` DB에 백업을 복원합니다.
 
 ```powershell
-.\db.ps1 Restore 'C:\path\to\basketball-20261117-150000.sql'
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\db.ps1 Restore 'C:\path\to\basketball-20261117-150000.sql'
 ```
 
 3. 저장소 루트에서 앱을 `docker` 프로필로 실행합니다. 복원된 Flyway 이력을 기준으로 이후 버전만 적용됩니다.

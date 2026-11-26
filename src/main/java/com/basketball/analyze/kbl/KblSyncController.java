@@ -47,13 +47,26 @@ class KblSyncController {
         return service.syncMatches(leagueKey, range.fromDate(), range.toDate());
     }
 
+    /** 지정 기간에 적재된 종료 경기의 쿼터 점수를 저장하고 경기별 실패 내역을 반환합니다. */
+    @PostMapping("/seasons/{leagueKey}/matches/quarters/sync")
+    public KblSyncService.QuarterRangeSyncResult syncMatchQuartersInRange(
+            @PathVariable("leagueKey") String leagueKey, @RequestBody MatchDateRange range) {
+        return service.syncMatchQuartersInRange(leagueKey, range.fromDate(), range.toDate());
+    }
+
+    /** 이미 적재된 종료 경기 한 건의 홈·원정 1~4쿼터 점수를 수집해 저장합니다. */
+    @PostMapping("/matches/{matchCode}/quarters/sync")
+    public KblSyncService.QuarterSyncResult syncMatchQuarters(@PathVariable("matchCode") String matchCode) {
+        return service.syncMatchQuarters(matchCode);
+    }
+
     /** 요청 검증·선행 적재·외부 조회 오류의 원인을 응답에 담습니다. */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ProblemDetail> handleSyncError(ResponseStatusException exception) {
         return ResponseEntity.status(exception.getStatusCode()).body(exception.getBody());
     }
 
-    /** 경기 조회 요청의 JSON 본문을 읽지 못했을 때 입력 형식을 안내합니다. */
+    /** 기간을 받는 수집 요청의 JSON 본문을 읽지 못했을 때 입력 형식을 안내합니다. */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleInvalidBody() {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,

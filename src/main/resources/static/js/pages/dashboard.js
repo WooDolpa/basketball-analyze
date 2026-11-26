@@ -1,36 +1,96 @@
 import { SEASONS, getMatches, getStandings, getTeam, getWeekDates, getPlayerLeaders } from '../data/demo-data.js';
 import { mountAppShell, showToast } from '../components/app-shell.js';
 import { renderMetrics } from '../components/metrics.js';
-import { matchCard, renderMatchPreview, renderMatchInsights } from '../components/match-preview.js';
+import { predictionMatchCard, renderPredictionDetail } from '../components/match-preview.js';
 import { icon, pageHref } from '../components/ui.js';
 import { readPageState, persistPageState } from '../state/preferences.js';
 import { formatKoreanDate, escapeHtml } from '../utils/format.js';
 import { exportMatchReport } from '../utils/export.js';
 
 const state = readPageState();
+const koreanDate = new Intl.DateTimeFormat('ko-KR', {
+    month: 'long', day: 'numeric', weekday: 'long', timeZone: 'Asia/Seoul',
+});
+const matchCards = document.getElementById('match-cards');
+const matchCount = document.getElementById('match-count');
+const matchDateCaption = document.getElementById('match-date-caption');
+const predictionDetails = document.getElementById('prediction-details');
+const predictionStatus = document.getElementById('prediction-status');
+const predictionStatusMessage = document.getElementById('prediction-status-message');
+const retryPredictions = document.getElementById('retry-predictions');
+let predictionMatches = [];
 
-/** 대시보드의 핵심 지표와 경기 요약을 표시합니다. */
-function renderDashboard() {
+/** 선택한 시즌의 예시 지표와 분석 메뉴 링크를 표시합니다. */
+function renderDashboardOverview() {
     const season = SEASONS[state.season];
     const matches = getMatches(state.dayIndex, state.season);
     const date = getWeekDates(state.season)[state.dayIndex];
     renderMetrics(document.getElementById('summary-metrics'), [
-        { label: '선택 날짜 경기', value: matches.length, unit: '경기', detail: formatKoreanDate(date), icon: 'calendar', values: [2, 3, 2, 4, 3, matches.length] },
+        { label: '예시 일정 경기', value: matches.length, unit: '경기', detail: formatKoreanDate(date), icon: 'calendar', values: [2, 3, 2, 4, 3, matches.length] },
         { label: '승부 예측 적중률', value: season.accuracy.toFixed(1), unit: '%', detail: '평가 결과 예시', icon: 'target', accent: true, values: [56, 59, 58, 64, 62, season.accuracy] },
         { label: '시즌 진행 경기', value: season.completedGames, unit: '/ 270', detail: '정규시즌 · 예시 집계', icon: 'ball', values: [8, 13, 17, 25, 30, season.completedGames] },
         { label: '팀 평균 득점', value: season.averageScore.toFixed(1), unit: '점', detail: '팀당 경기 평균 · 예시', icon: 'activity', values: [78, 82, 80, 84, 81, season.averageScore] },
     ]);
-    document.getElementById('match-count').textContent = String(matches.length).padStart(2, '0');
-    document.getElementById('match-date-caption').textContent = formatKoreanDate(date);
     document.getElementById('schedule-link').href = pageHref('schedule', { day: state.dayIndex, season: state.season });
-    document.getElementById('match-cards').innerHTML = matches.map((match) => matchCard(match, {
-        href: pageHref('schedule', { day: state.dayIndex, match: match.id, season: state.season }),
-    })).join('');
-    const featured = matches.find((match) => match.id === state.selectedMatchId) ?? matches[0];
-    renderMatchPreview(document.getElementById('featured-match'), featured, state.season);
-    renderMatchInsights(document.getElementById('match-insights'), featured);
     renderOverviewLinks();
     persistPageState(state);
+}
+
+/** 경기 목록의 로딩·빈 결과·오류 안내와 재조회 버튼을 표시합니다. */
+function showPredictionStatus(message, canRetry = false) {
+    predictionStatusMessage.textContent = message;
+    predictionStatus.hidden = !message;
+    retryPredictions.hidden = !canRetry;
+}
+
+/** 현재 경기의 선택 상태와 승률·Elo 상세를 함께 갱신합니다. */
+function selectPrediction(index) {
+    const match = predictionMatches[index];
+    if (!match) return;
+
+    matchCards.querySelectorAll('[data-prediction-index]').forEach((card) => {
+        const selected = Number(card.dataset.predictionIndex) === index;
+        card.classList.toggle('is-selected', selected);
+        card.setAttribute('aria-pressed', String(selected));
+    });
+    renderPredictionDetail(document.getElementById('featured-match'), document.getElementById('match-insights'), match);
+}
+
+/** 경기 카드의 번호를 읽어 대시보드 안에서 선택을 바꿉니다. */
+function handlePredictionSelection(event) {
+    const card = event.target.closest('[data-prediction-index]');
+    if (card) selectPrediction(Number(card.dataset.predictionIndex));
+}
+
+/** 한국시간 기준 오늘 경기와 Elo 예측을 조회해 목록 및 첫 경기 상세를 표시합니다. */
+async function loadTodayPredictions() {
+    matchCards.hidden = true;
+    matchCount.hidden = true;
+    matchDateCaption.hidden = true;
+    predictionDetails.hidden = true;
+    showPredictionStatus('오늘 예정 경기를 불러오는 중입니다.');
+
+    try {
+        const response = await fetch('/api/kbl/predictions/today', { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`예측 조회 실패 (${response.status})`);
+
+        const { seasonId, date, matches } = await response.json();
+        const formattedDate = koreanDate.format(new Date(`${date}T00:00:00+09:00`));
+        predictionMatches = matches;
+        matchCards.innerHTML = matches.map(predictionMatchCard).join('');
+        matchCount.textContent = `${matches.length}경기`;
+        matchDateCaption.textContent = `${seasonId.replace('-', '–')} 정규시즌 · ${formattedDate} · 한국시간`;
+
+        if (matches.length) selectPrediction(0);
+
+        matchCount.hidden = false;
+        matchDateCaption.hidden = false;
+        matchCards.hidden = !matches.length;
+        predictionDetails.hidden = !matches.length;
+        showPredictionStatus(matches.length ? '' : '오늘 남은 예정 경기가 없습니다.');
+    } catch {
+        showPredictionStatus('오늘 예정 경기를 불러오지 못했습니다.', true);
+    }
 }
 
 /** 상세 정보를 독립 메뉴 페이지로 연결하는 요약 카드를 만듭니다. */
@@ -50,11 +110,10 @@ function renderOverviewLinks() {
         </a>`).join('');
 }
 
-/** 시즌 변경을 대시보드와 다른 페이지의 공유 설정에 반영합니다. */
+/** 시즌 변경을 예시 지표와 다른 페이지의 공유 설정에 반영합니다. */
 function handleSeasonChange(season) {
     state.season = season;
-    state.selectedMatchId = null;
-    renderDashboard();
+    renderDashboardOverview();
 }
 
 /** 선택 날짜의 예시 경기 요약을 CSV로 저장합니다. */
@@ -64,5 +123,8 @@ function handleExport() {
 }
 
 mountAppShell('dashboard', state, handleSeasonChange);
-renderDashboard();
+renderDashboardOverview();
 document.getElementById('export-button').addEventListener('click', handleExport);
+matchCards.addEventListener('click', handlePredictionSelection);
+retryPredictions.addEventListener('click', loadTodayPredictions);
+loadTodayPredictions();
