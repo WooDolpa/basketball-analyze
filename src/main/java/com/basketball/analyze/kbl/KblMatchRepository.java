@@ -60,6 +60,26 @@ class KblMatchRepository {
                 rs.getString("away_team_code"), rs.getString("away_team_name")), seasonId, queriedAt, nextDayStart);
     }
 
+    /** 오늘 자정 전에 시작해 종료된 사용 상태의 경기를 Elo 반영 순서로 읽습니다. */
+    List<FinishedMatchRow> findFinishedMatchesBefore(String seasonId, LocalDateTime todayStart) {
+        return jdbc.query("""
+                SELECT home_team.id AS home_team_code, away_team.id AS away_team_code, m.win_type
+                FROM cc_season_match m
+                JOIN cc_season_team home_st ON home_st.cc_season_id = m.cc_season_id
+                    AND home_st.id = m.home_season_team_id AND home_st.data_status = 'Y'
+                JOIN cc_season_team away_st ON away_st.cc_season_id = m.cc_season_id
+                    AND away_st.id = m.away_season_team_id AND away_st.data_status = 'Y'
+                JOIN cc_team home_team ON home_team.id = home_st.cc_team_id AND home_team.data_status = 'Y'
+                JOIN cc_team away_team ON away_team.id = away_st.cc_team_id AND away_team.data_status = 'Y'
+                WHERE m.cc_season_id = ? AND m.match_status = 'FINISHED' AND m.data_status = 'Y'
+                  AND m.win_type IN ('HOME', 'AWAY') AND m.match_datetime < ?
+                ORDER BY m.match_datetime, m.match_code
+                """, (rs, rowNum) -> new FinishedMatchRow(rs.getString("home_team_code"),
+                rs.getString("away_team_code"), "HOME".equals(rs.getString("win_type"))), seasonId, todayStart);
+    }
+
+    record FinishedMatchRow(String homeTeamCode, String awayTeamCode, boolean homeWon) {}
+
     record MatchRow(
             int id,
             String matchCode,

@@ -2,7 +2,7 @@
 
 Spring Boot 정적 리소스로 제공하는 로컬 농구 분석 UI입니다. 별도의 프런트엔드 빌드 도구나 외부 CDN 없이 동작하며, 각 메뉴는 독립 HTML 페이지로 이동합니다.
 
-최종 정리: 2026-10-26. 프로젝트 범위·예측 검토안은 [프로젝트 현황](project-status.md), 실제 API 항목·샘플·검증 결과는 [KBL API 데이터 정리](kbl-api-data.md)를 참고합니다. API 조회 검증은 화면의 실제 데이터 연동 완료를 뜻하지 않습니다.
+최종 정리일은 2026-11-26입니다. 프로젝트 범위와 로컬 API 진행 상황은 [프로젝트 현황](project-status.md), 외부 API 조사 결과는 [KBL API 데이터 정리](kbl-api-data.md)를 참고합니다.
 
 ## 메뉴별 주소
 
@@ -39,10 +39,10 @@ src/main/resources/static/
 
 ## 실행
 
-[로컬 MariaDB 실행 안내](../docker/README.md)에 따라 DB를 시작한 뒤 저장소 루트에서 Spring Boot를 `docker` 프로필로 실행하고 `http://localhost:9000/`에 접속합니다.
+[로컬 MariaDB 실행 안내](../docker/README.md)에 따라 DB를 시작한 뒤 저장소 루트에서 Spring Boot를 `docker` 프로필로 실행합니다. 아래 예시는 Mac에서 검수한 포트 `9001`을 사용하며 접속 주소는 `http://localhost:9001/`입니다.
 
 ```powershell
-.\gradlew.bat bootRun --args="--spring.profiles.active=docker"
+.\gradlew.bat bootRun --args="--spring.profiles.active=docker --server.port=9001"
 ```
 
 Python이 설치된 환경에서는 저장소 루트에서 아래 명령으로 DB 연결 없이 화면만 확인할 수도 있습니다.
@@ -66,7 +66,7 @@ python -m http.server 5173 --bind 127.0.0.1 --directory src/main/resources/stati
 - 대시보드와 경기 일정은 선택 날짜의 예시 경기 리포트를 CSV로 내보냅니다.
 - 모든 페이지에 모바일 메뉴·키보드 탐색·동작 감소 설정을 공통 적용합니다.
 
-일정·팀·선수 기록·예측 확률·적중률은 모두 UI 검토용 예시입니다. 개발 DB에는 2026–2027 정규리그 일정과 결과가 적재됐습니다. 다음 화면 작업안은 오늘 경기 조회 API를 대시보드의 경기 카드와 상세 영역에 연결하는 것입니다. 시작 시간, 두 팀의 예상 승률, Elo 차이에 따른 예측 근거를 표시하고, 예정 경기 없음과 조회 실패를 구분합니다. [초기 승부예측 MVP](project-status.md#초기-승부예측-mvp)
+현재 화면의 일정·팀·선수 기록·예상 승률·적중률은 UI 검토용 예시입니다. 다음 화면 작업은 `GET /api/kbl/predictions/today`를 대시보드에 연결하는 것입니다. 이 경로 한 번으로 시작 시간·양 팀·예상 승률·예측 근거를 받아 경기 카드와 상세 영역에 표시할 수 있습니다. 로딩, 남은 경기 없음, 예측 데이터 부족, 조회 실패를 구분합니다. 일정만 필요한 경우에는 `GET /api/kbl/matches/today`를 사용합니다. [초기 승부예측 MVP](project-status.md#초기-승부예측-mvp)
 
 ## 확인한 동작
 

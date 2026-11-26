@@ -1,10 +1,10 @@
 # 로컬 MariaDB 실행·백업·복원
 
-Docker·백업·복원 명령은 `docker/` 폴더에서 실행합니다. Docker Desktop의 Linux 엔진과 Compose가 필요합니다. 백업·복원은 PowerShell 7.4 이상을 사용합니다.
+Docker·백업·복원 명령은 `docker/` 폴더에서 실행합니다. 실행 중인 Docker 엔진과 Docker Compose가 필요합니다. 백업·복원 스크립트 `db.ps1`은 PowerShell 7.4 이상에서 실행합니다.
 
 ## 시작
 
-1. 저장소 루트에서 `Set-Location docker`를 실행합니다. 새 PC에서는 `.env.example`을 `.env`로 복사하고 `MARIADB_PASSWORD`와 `MARIADB_ROOT_PASSWORD`에 서로 다른 비밀번호를 입력합니다. Docker Compose와 Spring Boot가 같은 파일을 읽으므로 따옴표 없이 영문·숫자로 된 긴 비밀번호를 사용합니다.
+1. 저장소 루트에서 PowerShell은 `Set-Location docker`, macOS 셸은 `cd docker`를 실행합니다. 새 PC에서는 `.env.example`을 `.env`로 복사하고 `MARIADB_PASSWORD`와 `MARIADB_ROOT_PASSWORD`에 서로 다른 비밀번호를 입력합니다. Docker Compose와 Spring Boot가 같은 파일을 읽으므로 따옴표 없이 영문·숫자로 된 긴 비밀번호를 사용합니다.
 2. 아래 명령으로 컨테이너를 시작합니다. JDBC 접속 주소는 기본 `jdbc:mariadb://127.0.0.1:3307/basketball`입니다. 포트 충돌이 있으면 `.env`의 `MARIADB_PORT`만 변경합니다.
 
 ```powershell
@@ -19,7 +19,15 @@ Set-Location ..
 .\gradlew.bat bootRun --args="--spring.profiles.active=docker"
 ```
 
-IntelliJ에서는 저장소 루트를 작업 디렉터리로 지정하고 `docker` 프로필을 사용합니다. 해당 실행 설정에는 기존 원격 DB용 `-DMARIADB_*` 옵션을 빼고 `docker/.env`에서 접속 정보를 읽게 합니다.
+macOS에서 `docker/` 폴더를 기준으로 실행하는 예시입니다. 프로젝트 검수에는 앱 포트 `9001`을 사용했습니다.
+
+```bash
+cd ..
+JAVA_HOME=$(/usr/libexec/java_home -v 25) sh ./gradlew bootRun \
+  --args='--spring.profiles.active=docker --server.address=127.0.0.1 --server.port=9001'
+```
+
+IntelliJ에서는 저장소 루트를 작업 디렉터리로 지정하고 활성 프로필에 `docker`를 입력합니다. 활성 프로필 입력란이 없으면 Program arguments에 `--spring.profiles.active=docker`를 추가합니다. 실행 설정에서 기존 원격 DB용 `-DMARIADB_*` 옵션을 빼고 `docker/.env`에서 접속 정보를 읽게 합니다. `host, pipe or local socket must be set to connect socket`이 나오면 활성 프로필과 DB URL을 먼저 확인합니다. 기본 프로필에서 `MARIADB_URL`이 비어 있으면 연결할 호스트가 없습니다.
 
 Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 차례대로 적용합니다. `V1`에는 ERD의 8개 테이블과 제약조건이 포함되어 있습니다. 적용한 마이그레이션은 보존하고 다음 스키마 변경을 `V2__설명.sql`처럼 새 파일에 기록합니다.
 
@@ -27,7 +35,7 @@ Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 �
 
 ## 비밀번호 변경과 빈 DB 초기화
 
-- 기존 DB를 유지할 때는 MariaDB 계정 비밀번호를 먼저 바꾸고, `docker/.env`의 해당 비밀번호를 같은 값으로 수정합니다. `docker/`에서 `docker compose up -d --wait`를 실행한 뒤 앱을 다시 시작합니다.
+- 기존 DB를 유지할 때는 MariaDB의 앱 계정 및 `root` 비밀번호를 먼저 변경하고, `docker/.env`의 `MARIADB_USER`, `MARIADB_PASSWORD`, `MARIADB_ROOT_PASSWORD`를 맞춥니다. 초기화된 볼륨의 계정 정보는 `.env` 수정만으로 갱신되지 않습니다. 앱 계정 이름을 바꿀 때는 새 계정에 `basketball` 스키마 권한을 부여하고, 앱의 새 계정 접속 확인 후 이전 계정을 정리합니다. `docker/`에서 `docker compose up -d --wait`를 실행한 뒤 앱을 다시 시작합니다.
 - DB를 새로 만들 때는 빈 볼륨으로 시작하면 `.env`에 입력한 비밀번호로 계정이 생성됩니다. `docker compose down -v`는 해당 프로젝트의 DB 볼륨과 데이터를 삭제합니다. 보존할 데이터가 있다면 먼저 SQL로 백업합니다. 새 볼륨을 만든 뒤 앱을 시작하면 Flyway가 스키마를 적용합니다.
 
 ## 백업
@@ -39,6 +47,8 @@ Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 �
 ```
 
 경로를 지정하려면 `Backup` 뒤에 SQL 파일 경로를 넘깁니다. `.env`와 기본 백업 폴더는 Git에서 제외됩니다. PC를 옮길 때는 사용할 Git 버전을 새 PC에서 체크아웃하고 SQL 파일을 별도로 옮깁니다.
+
+Mac에서 2026-11-25에 재적재한 DB의 백업 파일은 `docker/backups/basketball-20261125-232448.sql`입니다. 별도 MariaDB에서 복원을 검수했습니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
 
 ## 새 PC에서 복원
 

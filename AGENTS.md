@@ -11,10 +11,12 @@
 
 ## Project Structure & Module Organization
 
-Java 25, Spring Boot 4.1.1, Gradle, Spring MVC, Spring Data JPA, MariaDB, QueryDSL 7.6을 사용하는 단일 모듈 프로젝트입니다. 로컬 전용 남자 KBL 분석·승부예측 시스템을 목표로 하며, 현재 예시 데이터 기반 정적 UI만 구현되어 있습니다. 수집기·업무 API·DB 저장·예측 모델은 아직 연결하지 않았습니다.
+Java 25, Spring Boot 4.1.1, Gradle, Spring MVC, Spring Data JPA, MariaDB, QueryDSL 7.6 기반의 단일 모듈입니다. KBL 2026–2027 정규리그의 수집·저장 API 4개와 오늘 예정 경기·Elo 승률 조회 API 2개를 구현했습니다. DB 접근은 `JdbcTemplate`을 사용합니다. 정적 UI는 예시 데이터를 사용하며, 예정 경기의 Elo 계산값 검수와 대시보드 연동이 남아 있습니다.
 
 - `src/main/java/com/basketball/analyze/`: application source; `Application.java` is the entry point. Keep new packages beneath this root for component scanning.
+- `src/main/java/com/basketball/analyze/kbl/`: KBL 수집 클라이언트, 수집·조회·예측 API와 서비스, JDBC 저장소.
 - `src/main/resources/application.yaml`: runtime configuration.
+- `src/main/resources/application-docker.yaml`, `src/main/resources/db/migration/`: 로컬 MariaDB 접속 설정과 Flyway 버전별 스키마.
 - `src/main/resources/static/`: 독립 HTML 화면과 `css/`, `js/`, `assets/`. 페이지 코드는 각 `pages/`, 공통 UI는 `components/`, 예시 데이터는 `js/data/demo-data.js`에 둡니다.
 - `templates/`: 현재 사용하지 않습니다.
 - `src/test/java/`: intended test location; not created yet.
@@ -30,11 +32,11 @@ Install JDK 25 and use the checked-in Gradle wrapper. From the repository root i
 ```powershell
 .\gradlew.bat clean build  # Compile, run configured tests, and package
 .\gradlew.bat test         # Run tests once test support is configured
-.\gradlew.bat bootRun      # Start locally on port 9000
+.\gradlew.bat bootRun --args="--spring.profiles.active=docker"  # Start with the local Docker DB
 .\gradlew.bat bootJar      # Create the executable JAR under build/libs/
 ```
 
-On macOS/Linux, use `./gradlew` instead. QueryDSL generation runs during Java compilation.
+On macOS/Linux, use `./gradlew` instead. QueryDSL generation runs during Java compilation. 앱 포트는 `server.port` 또는 실행 인자 `--server.port`를 확인합니다. Mac 검수에서는 `9001`을 사용했습니다.
 
 작업 규칙에 따라 빌드·테스트는 자동 실행하지 않아도 됩니다. 실제 수행한 확인만 결과에 기록합니다. UI는 별도의 프런트엔드 빌드 도구 없이 Spring Boot 정적 리소스로 제공됩니다.
 
