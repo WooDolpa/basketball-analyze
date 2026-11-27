@@ -31,7 +31,6 @@ function renderDashboardOverview() {
         { label: '시즌 진행 경기', value: season.completedGames, unit: '/ 270', detail: '정규시즌 · 예시 집계', icon: 'ball', values: [8, 13, 17, 25, 30, season.completedGames] },
         { label: '팀 평균 득점', value: season.averageScore.toFixed(1), unit: '점', detail: '팀당 경기 평균 · 예시', icon: 'activity', values: [78, 82, 80, 84, 81, season.averageScore] },
     ]);
-    document.getElementById('schedule-link').href = pageHref('schedule', { day: state.dayIndex, season: state.season });
     renderOverviewLinks();
     persistPageState(state);
 }

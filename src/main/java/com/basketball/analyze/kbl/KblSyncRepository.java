@@ -11,8 +11,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Repository
@@ -46,6 +50,45 @@ class KblSyncRepository {
                 VALUES (?, ?, 'Y', CURRENT_TIMESTAMP)
                 ON DUPLICATE KEY UPDATE name = VALUES(name), modified_date = CURRENT_TIMESTAMP
                 """, teams.stream().map(team -> new Object[]{team.code(), team.name()}).toList());
+    }
+
+    /** 소속을 내부 ID로 연결한 뒤 복합 키로 신규 관계만 저장합니다. */
+    @Transactional
+    public void saveRosters(String seasonId, String leagueKey, List<KblPlayerClient.RegisteredPlayer> players) {
+        requireSeason(seasonId, leagueKey);
+        Map<String, String> seasonTeamIds = new HashMap<>();
+        jdbc.query("SELECT cc_team_id, id FROM cc_season_team WHERE cc_season_id = ?", row -> {
+            seasonTeamIds.put(row.getString("cc_team_id"), row.getString("id"));
+        }, seasonId);
+        Map<String, String> playerIds = new HashMap<>();
+        jdbc.query("SELECT code, id FROM cc_player", row -> {
+            playerIds.put(row.getString("code"), row.getString("id"));
+        });
+
+        List<KblPlayerClient.RegisteredPlayer> ordered = players.stream()
+                .sorted(Comparator.comparing(KblPlayerClient.RegisteredPlayer::teamCode)
+                        .thenComparing(KblPlayerClient.RegisteredPlayer::code))
+                .toList();
+        List<Object[]> rows = new ArrayList<>(players.size());
+        for (KblPlayerClient.RegisteredPlayer player : ordered) {
+            String teamId = seasonTeamIds.get(player.teamCode());
+            if (teamId == null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "시즌 " + seasonId + "의 참가팀 "
+                        + player.teamCode() + "이(가) 누락되었습니다. 시즌 순위 API(POST /api/kbl/seasons/"
+                        + leagueKey + "/standings/sync)를 먼저 호출해 주세요.");
+            }
+            String playerId = playerIds.get(player.code());
+            if (playerId == null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "선수 " + player.code()
+                        + "이(가) 누락되었습니다. 선수 기본 정보 API(POST /api/kbl/players/sync)를 먼저 호출해 주세요.");
+            }
+            rows.add(new Object[]{teamId, playerId});
+        }
+        jdbc.batchUpdate("""
+                INSERT INTO cc_season_team_roster (cc_season_team_id, cc_player_id)
+                VALUES (?, ?)
+                ON DUPLICATE KEY UPDATE cc_player_id = VALUES(cc_player_id)
+                """, rows);
     }
 
     /** 시즌과 구단이 준비된 상태에서 참가팀별 순위를 한 번에 반영합니다. */

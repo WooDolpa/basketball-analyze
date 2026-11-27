@@ -1,3 +1,5 @@
+import { formatMonthDay } from '../utils/format.js';
+
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 /** SVG 요소와 속성을 생성합니다. */
@@ -26,13 +28,13 @@ export function renderTrendChart(container, records, onSelect) {
     const height = 246;
     const bounds = { left: 34, right: 16, top: 18, bottom: 38 };
     const allValues = records.flatMap((record) => [record.scored, record.conceded]);
-    const minimum = Math.floor((Math.min(...allValues) - 5) / 10) * 10;
+    const minimum = Math.max(0, Math.floor((Math.min(...allValues) - 5) / 10) * 10);
     const maximum = Math.ceil((Math.max(...allValues) + 5) / 10) * 10;
     const plotWidth = width - bounds.left - bounds.right;
     const plotHeight = height - bounds.top - bounds.bottom;
     const svg = createSvgElement('svg', { viewBox: `0 0 ${width} ${height}`, role: 'group', 'aria-label': `최근 ${records.length}경기 득점과 실점. 각 지점을 선택하면 상세 기록이 표시됩니다.` });
     const points = records.map((record, index) => ({
-        x: bounds.left + index * plotWidth / (records.length - 1),
+        x: bounds.left + (records.length === 1 ? plotWidth / 2 : index * plotWidth / (records.length - 1)),
         scoredY: bounds.top + (maximum - record.scored) / (maximum - minimum) * plotHeight,
         concededY: bounds.top + (maximum - record.conceded) / (maximum - minimum) * plotHeight,
     }));
@@ -64,7 +66,7 @@ export function renderTrendChart(container, records, onSelect) {
 
     for (const [index, point] of points.entries()) {
         const record = records[index];
-        const dateLabel = `${record.date.getMonth() + 1}.${String(record.date.getDate()).padStart(2, '0')}`;
+        const dateLabel = formatMonthDay(record.date);
         svg.append(createSvgElement('text', { x: point.x, y: height - 10, 'text-anchor': 'middle', class: 'chart-axis-label' }, dateLabel));
         const group = createSvgElement('g', { class: 'chart-point-group', tabindex: 0, role: 'button', 'aria-pressed': false, 'aria-label': `${dateLabel} ${record.opponent}전, 득점 ${record.scored}, 실점 ${record.conceded}` });
         group.append(createSvgElement('rect', { x: point.x - 14, y: bounds.top, width: 28, height: plotHeight, fill: 'transparent' }));

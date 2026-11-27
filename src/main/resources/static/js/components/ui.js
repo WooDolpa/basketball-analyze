@@ -35,7 +35,7 @@ export function teamBadge(team, size = '') {
 /** 최근 경기의 승패를 색상과 접근 가능한 설명으로 표시합니다. */
 export function formDots(form) {
     const description = [...form].map((result) => result === 'W' ? '승' : '패').join(' ');
-    return `<span class="form-dots" aria-label="최근 5경기 ${description}">
+    return `<span class="form-dots" role="img" aria-label="최근 ${form.length}경기 ${description}">
         ${[...form].map((result) => `<i class="${result === 'W' ? 'win' : 'loss'}"></i>`).join('')}
     </span>`;
 }

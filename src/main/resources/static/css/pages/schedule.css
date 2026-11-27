@@ -1,7 +1,47 @@
-/* 경기 일정 페이지의 목록과 상세 프리뷰 배치입니다. */
+/* 경기 일정 페이지의 날짜 선택, 조회 상태, 목록과 점수 표를 배치합니다. */
 .schedule-panel { margin-top: 10px; }
-.schedule-panel .match-cards { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-body[data-page="schedule"] .preview-grid { margin-top: 26px; }
-@media (max-width: 760px) {
-    .schedule-panel .match-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.schedule-caption { color: var(--muted); font-size: 12px; }
+.schedule-panel .date-navigation .icon-button { width: 36px; height: 36px; }
+#schedule-date-input {
+    min-height: 36px;
+    max-width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    color-scheme: dark;
+    font: inherit;
+}
+#schedule-date-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.schedule-panel .match-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+.schedule-panel .schedule-match-card { gap: 9px; }
+.schedule-match-card .match-card-top { padding: 0; font-size: 12px; }
+.schedule-match-card .match-status { font-size: 11px; }
+.schedule-match-card .match-card-team { margin: 0; }
+.schedule-match-card .match-card-team > span:nth-child(2) { white-space: normal; overflow-wrap: anywhere; }
+.schedule-panel .schedule-match-card.is-selected .match-card-team > b { color: var(--text); }
+.schedule-status { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px; }
+.schedule-status p { color: var(--text-secondary); }
+.schedule-detail { margin-top: 20px; padding: 20px; }
+.schedule-detail-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; }
+.schedule-detail-heading h2 { overflow-wrap: anywhere; font-size: 16px; }
+.schedule-detail-heading h2 span { color: var(--muted); font-size: 12px; }
+.schedule-detail-meta { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+.schedule-detail-meta .match-status { font-size: 11px; }
+.schedule-score-wrap { margin-top: 14px; overflow-x: auto; }
+.schedule-score-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: right; }
+.schedule-score-table th, .schedule-score-table td { padding: 9px 7px; border-bottom: 1px solid var(--border-soft); }
+.schedule-score-table th:first-child { width: 36%; text-align: left; overflow-wrap: anywhere; }
+.schedule-score-table thead { background: var(--surface-soft); color: var(--muted); font-size: 12px; }
+.schedule-score-table tbody th { font-weight: 500; }
+.schedule-score-table td { font-family: var(--font-numeric); font-variant-numeric: tabular-nums; }
+.schedule-team-side { display: inline-block; margin-right: 6px; color: var(--muted); font-size: 11px; }
+.schedule-total-score { color: var(--accent); font-weight: 650; }
+
+@media (max-width: 480px) {
+    .schedule-panel .date-navigation { gap: 6px; }
+    .schedule-panel .day-tab { flex-direction: column; gap: 2px; }
+    .schedule-detail { padding: 12px; }
+    .schedule-score-table th, .schedule-score-table td { padding-inline: 4px; }
 }

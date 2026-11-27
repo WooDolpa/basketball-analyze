@@ -3,7 +3,7 @@
 .standings-panel .panel-heading { padding-bottom: 17px; }
 .table-scroll { overflow-x: auto; }
 .standings-table { width: 100%; border-collapse: collapse; text-align: center; white-space: nowrap; }
-.standings-table thead { background: #1d231b; }
+.standings-table thead { background: var(--surface-soft); }
 .standings-table th, .standings-table td { padding: 10px 4px; }
 .standings-table thead th { font-size: 8px; color: var(--subtle); font-weight: 400; border-block: 1px solid var(--border); }
 .standings-table thead th:nth-child(2) { text-align: left; padding-left: 7px; }
@@ -12,9 +12,9 @@
 .standings-table tbody td { font-family: var(--font-numeric); font-size: 11px; font-weight: 350; color: var(--muted); }
 .standings-table tbody tr { border-bottom: 1px solid var(--border-soft); }
 .standings-table tbody tr:last-child { border-bottom: 0; }
-.standings-table tbody tr.is-highlighted { background: #252f1d; }
+.standings-table tbody tr.is-highlighted { background: var(--accent-soft); }
 .standings-table tbody tr.is-highlighted td { color: var(--text-secondary); }
-.standings-table tbody tr:hover { background: #242c20; }
+.standings-table tbody tr:hover { background: var(--surface-hover); }
 .standings-table tbody th { font-weight: 400; text-align: left; }
 .rank-number { color: var(--muted); font-size: 10px; }
 .rank-number.top-rank { color: var(--accent); }
@@ -24,12 +24,12 @@
 .standings-table .win-rate { color: var(--text-secondary); }
 .form-dots { display: inline-flex; align-items: center; gap: 3px; }
 .form-dots i { width: 4px; height: 11px; border-radius: 2px; }
-.form-dots .win { background: #a4c96a; }
-.form-dots .loss { background: #3f4939; }
-.standings-table .playoff-cutoff { border-bottom: 1px dashed #5b6c43; }
+.form-dots .win { background: var(--accent); }
+.form-dots .loss { border: 1px solid var(--subtle); }
+.standings-table .playoff-cutoff { border-bottom: 1px dashed var(--muted-line); }
 .table-footnote { display: flex; align-items: center; gap: 5px; padding: 12px 18px; border-top: 1px solid var(--border); color: var(--subtle); font-size: 7px; }
 .table-footnote > span:last-child { margin-left: auto; font-size: 7px; }
-.playoff-key { width: 9px; border-top: 1px dashed #8a9f63; }
+.playoff-key { width: 9px; border-top: 1px dashed var(--muted-line); }
 @media (min-width: 1600px) {
     .standings-table th, .standings-table td { padding-block: 12px; }
 }

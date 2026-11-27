@@ -89,11 +89,17 @@ class KblMatchService {
         }
     }
 
-    /** 경기 상태 및 미확인 점수의 null을 유지해 기간별 일정 응답을 구성합니다. */
-    private KblScheduleResponse.Match toScheduleMatch(KblMatchRepository.MatchRow row) {
-        KblMatchResponse.Match match = toResponseMatch(row);
+    /** 기간별 일정에 홈·원정 쿼터 점수를 1~4쿼터 순으로 추가하고 미확인 점수는 null로 유지합니다. */
+    private KblScheduleResponse.Match toScheduleMatch(KblMatchRepository.ScheduleMatchRow row) {
+        KblMatchRepository.MatchRow matchRow = row.match();
+        KblMatchResponse.Match match = toResponseMatch(matchRow);
+        List<KblScheduleResponse.QuarterScore> quarters = List.of(
+                new KblScheduleResponse.QuarterScore(1, row.homeFirstQuarterScore(), row.awayFirstQuarterScore()),
+                new KblScheduleResponse.QuarterScore(2, row.homeSecondQuarterScore(), row.awaySecondQuarterScore()),
+                new KblScheduleResponse.QuarterScore(3, row.homeThirdQuarterScore(), row.awayThirdQuarterScore()),
+                new KblScheduleResponse.QuarterScore(4, row.homeFourthQuarterScore(), row.awayFourthQuarterScore()));
         return new KblScheduleResponse.Match(match.id(), match.matchCode(), match.startsAt(), match.status(),
-                match.homeTeam(), match.awayTeam(), row.homeScore(), row.awayScore());
+                match.homeTeam(), match.awayTeam(), matchRow.homeScore(), matchRow.awayScore(), quarters);
     }
 
     /** DB에 저장한 한국시간 경기 일시에 UTC 오프셋을 붙여 응답을 구성합니다. */

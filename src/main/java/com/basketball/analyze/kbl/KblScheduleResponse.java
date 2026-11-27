@@ -1,6 +1,7 @@
 package com.basketball.analyze.kbl;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -14,7 +15,7 @@ public record KblScheduleResponse(
         List<Match> matches
 ) {
 
-    /** 경기의 예정 시작 시각과 DB에 확인된 양 팀의 점수를 담습니다. */
+    /** 경기의 예정 시작 시각과 양 팀의 합계 및 쿼터 점수를 담습니다. */
     public record Match(
             int id,
             String matchCode,
@@ -25,6 +26,11 @@ public record KblScheduleResponse(
             KblMatchResponse.Team homeTeam,
             KblMatchResponse.Team awayTeam,
             Integer homeScore,
-            Integer awayScore
+            Integer awayScore,
+            List<QuarterScore> quarters
     ) {}
+
+    /** 쿼터 번호와 양 팀 점수를 담고 미확인 점수는 JSON null로 표시합니다. */
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    public record QuarterScore(int quarter, Integer homeScore, Integer awayScore) {}
 }

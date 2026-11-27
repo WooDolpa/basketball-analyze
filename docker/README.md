@@ -29,7 +29,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 25) sh ./gradlew bootRun \
 
 IntelliJ에서는 저장소 루트를 작업 디렉터리로 지정하고 활성 프로필에 `docker`를 입력합니다. 활성 프로필 입력란이 없으면 Program arguments에 `--spring.profiles.active=docker`를 추가합니다. 실행 설정에서 기존 원격 DB용 `-DMARIADB_*` 옵션을 빼고 `docker/.env`에서 접속 정보를 읽게 합니다. `host, pipe or local socket must be set to connect socket`이 나오면 활성 프로필과 DB URL을 먼저 확인합니다. 기본 프로필에서 `MARIADB_URL`이 비어 있으면 연결할 호스트가 없습니다.
 
-Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 차례대로 적용합니다. `V1`에는 ERD의 8개 테이블과 제약조건이 포함되어 있습니다. 적용한 마이그레이션은 보존하고 다음 스키마 변경을 `V2__설명.sql`처럼 새 파일에 기록합니다.
+Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 차례대로 적용합니다. `V1`은 기본 테이블 8개, `V2`는 선수 코드 고유 제약과 내부 ID 시퀀스, `V3`는 경기별 출전 여부를 추가합니다. 적용한 마이그레이션은 보존하고 다음 스키마 변경은 새 버전 파일에 기록합니다. [데이터 저장 설계](../docs/data-model.md)
 
 컨테이너를 종료하려면 `docker compose stop`을 실행합니다. 데이터는 Docker의 `mariadb-data` 볼륨에 유지됩니다.
 
@@ -61,7 +61,7 @@ Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 �
 
 별도 경로를 쓰려면 `Backup` 뒤에 새 SQL 파일 경로를 넘깁니다. `.env`와 기본 백업 폴더는 Git에서 제외됩니다. PC를 옮길 때는 사용할 Git 버전을 새 PC에서 체크아웃하고, SQL 파일을 별도로 복사한 뒤 새 PC의 `.env`를 구성합니다.
 
-2026-11-25 Mac 재적재 직후 만든 백업은 `docker/backups/basketball-20261125-232448.sql`입니다. 그 파일은 별도 MariaDB에 복원해 검수했습니다. 11월 26일에 적재한 쿼터 점수 74건을 담으려면 위 절차로 현재 DB를 새로 백업합니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
+2026-11-25 Mac 재적재 직후 만든 `basketball-20261125-232448.sql`은 별도 MariaDB에 복원해 검수했습니다. 현재 Windows 개발 DB의 Flyway `V3` 이력, 쿼터 점수, 선수 224명과 경기별 선수 기록 1,776행을 보관할 때는 위 절차로 현재 DB를 백업합니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
 
 ## 새 PC에서 복원
 

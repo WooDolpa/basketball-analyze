@@ -3,11 +3,14 @@
 body[data-page="player-records"] .leaders-panel { margin-top: 0; }
 .player-records-panel { overflow: hidden; margin-top: 24px; }
 .player-records-panel .panel-heading { padding-bottom: 20px; }
-.player-records-table { min-width: 600px; }
+.player-records-status { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 0 23px 22px; color: var(--text-secondary); }
+.player-appearance-notice { padding: 0 23px 14px; color: var(--text-secondary); font-size: 12px; }
+.player-records-table { min-width: 680px; }
 .player-records-table tr > :first-child { width: 70px; }
 .player-records-table .standings-team { justify-content: flex-start; font-size: 12px; }
 .player-records-table tr > :nth-child(3) { text-align: left; }
 .player-records-table thead th:nth-child(3) { padding-left: 24px; }
+.player-team-links { display: flex; align-items: flex-start; flex-direction: column; gap: 4px; }
 body[data-page="player-records"] .player-card { padding-block: 25px; }
 @media (max-width: 760px) {
     .player-records-panel .panel-heading { flex-wrap: wrap; }

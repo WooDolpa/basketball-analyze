@@ -32,13 +32,35 @@ function renderNavigation(pageId) {
 
 /** 공통 메뉴·상단 바·시즌 선택·안내창을 현재 페이지에 구성합니다. */
 export function mountAppShell(pageId, state, onSeasonChange) {
-    const isDashboard = pageId === 'dashboard';
-    const dataNotice = isDashboard
-        ? '오늘 예정 경기와 승률은 KBL 일정 및 Elo 예측을 사용합니다. 시즌 지표와 내보내기 리포트는 예시입니다.'
-        : '모든 경기·기록·예측은 UI 확인용 예시입니다. 실제 KBL 데이터 및 예측 모델은 연결되지 않았습니다.';
-    const guideDescription = isDashboard
-        ? '오늘 예정 경기의 카드를 선택하면 양 팀의 예상 승률과 Elo 예측 근거를 볼 수 있습니다. 화면의 시즌 지표는 예시입니다.'
-        : '현재 화면은 예시 데이터로 동작합니다. 예측 확률과 적중률은 실제 모델의 결과가 아닙니다.';
+    const isSchedule = pageId === 'schedule';
+    const badgeText = {
+        dashboard: '일부 예시 데이터',
+        schedule: 'KBL 경기 데이터',
+        standings: '시즌별 순위',
+        teamManagement: '시즌별 팀 기록',
+        players: '시즌별 선수 기록',
+    }[pageId] ?? '예시 데이터';
+    const dataNotice = {
+        dashboard: '오늘 예정 경기와 승률은 KBL 일정 및 Elo 예측을 사용합니다. 시즌 지표와 내보내기 리포트는 예시입니다.',
+        schedule: '경기 일정과 점수는 로컬 DB에 적재한 KBL 정규시즌 기록입니다.',
+        standings: '2026–2027 순위와 최근 경기 결과는 로컬 DB에 적재한 KBL 기록입니다. 2025–2026 순위는 화면 검토용 예시입니다.',
+        players: '2026–2027 선수 기록은 로컬 DB에 적재한 KBL 경기에서 계산합니다. 2025–2026 선수 기록은 화면 검토용 예시입니다.',
+        teamManagement: '2026–2027의 시즌 성적과 최근 경기는 로컬 DB에 적재한 KBL 기록입니다. 2025–2026 팀 기록은 화면 검토용 예시입니다.',
+    }[pageId] ?? '모든 경기·기록·예측은 UI 확인용 예시입니다. 실제 KBL 데이터 및 예측 모델은 연결되지 않았습니다.';
+    const guideDescription = {
+        dashboard: '오늘 예정 경기의 카드를 선택하면 양 팀의 예상 승률과 Elo 예측 근거를 볼 수 있습니다. 화면의 시즌 지표는 예시입니다.',
+        schedule: '날짜를 선택해 KBL 경기 목록을 열고, 경기 카드를 누르면 쿼터별 점수와 합계를 볼 수 있습니다.',
+        standings: '2026–2027 정규리그 순위와 최근 5경기 승패를 확인할 수 있습니다. 최근 경기 표시는 오른쪽이 가장 최신입니다.',
+        teamManagement: '팀과 경기 수를 선택해 시즌 성적과 최근 득점·실점 흐름을 확인하세요.',
+        players: '득점·리바운드·어시스트를 선택하면 경기당 평균 순으로 시즌 리더와 기록표가 정렬됩니다.',
+    }[pageId] ?? '현재 화면은 예시 데이터로 동작합니다. 예측 확률과 적중률은 실제 모델의 결과가 아닙니다.';
+    const seasonPicker = isSchedule ? '' : `
+        <label class="nav-label" for="season-select">SEASON</label>
+        <div class="select-wrap season-select-wrap">
+            <select id="season-select">${Object.entries(SEASONS).map(([id, season]) =>
+                `<option value="${id}">${season.label} 시즌</option>`).join('')}</select>
+            ${icon('chevron-down')}
+        </div>`;
     const main = document.getElementById('main-content');
     const shell = document.createElement('div');
     shell.className = 'app-shell';
@@ -60,12 +82,7 @@ export function mountAppShell(pageId, state, onSeasonChange) {
                 <div class="tiny-court" aria-hidden="true"><i></i></div>
             </div>
             <div class="sidebar-bottom">
-                <label class="nav-label" for="season-select">SEASON</label>
-                <div class="select-wrap season-select-wrap">
-                    <select id="season-select">${Object.entries(SEASONS).map(([id, season]) =>
-                        `<option value="${id}">${season.label} 시즌</option>`).join('')}</select>
-                    ${icon('chevron-down')}
-                </div>
+                ${seasonPicker}
                 <div class="local-status"><span class="status-dot"></span>로컬 워크스페이스<span>v0.1</span></div>
             </div>
         </aside>
@@ -78,7 +95,7 @@ export function mountAppShell(pageId, state, onSeasonChange) {
                     <span class="breadcrumb">워크스페이스 <span>/</span> ${PAGES[pageId].parentLabel ? `<span>${PAGES[pageId].parentLabel}</span><span>/</span>` : ''}<strong>${PAGES[pageId].label}</strong></span>
                 </div>
                 <div class="topbar-actions">
-                    <span class="demo-badge"><span></span>${isDashboard ? '일부 예시 데이터' : '예시 데이터'}</span><span class="topbar-divider"></span>
+                    <span class="demo-badge"><span></span>${badgeText}</span><span class="topbar-divider"></span>
                     <button type="button" class="icon-button" id="guide-button" aria-label="화면 이용 안내">${icon('help')}</button>
                     <span class="user-avatar" aria-label="개인 워크스페이스">ME</span>
                 </div>
@@ -103,13 +120,15 @@ export function mountAppShell(pageId, state, onSeasonChange) {
             <ol>
                 <li><strong>메뉴별 독립 페이지</strong><span>경기 일정·리그 순위·선수 기록으로 이동하거나, 팀 메뉴를 펼쳐 팀관리를 선택하세요.</span></li>
                 <li><strong>기록을 이어서 탐색</strong><span>순위표의 팀을 선택하면 해당 팀의 팀관리 화면으로 이동합니다. 시즌과 선택 설정은 페이지 간 유지됩니다.</span></li>
-                <li><strong>예시 기록 저장</strong><span>경기 일정과 대시보드의 내보내기 버튼으로 선택 날짜의 CSV를 저장할 수 있습니다.</span></li>
+                <li><strong>CSV 저장</strong><span>경기 일정 화면에서 선택 날짜의 경기 기록을 CSV로 저장할 수 있습니다.</span></li>
             </ol>
             <div class="dialog-footer"><span class="status-dot"></span>화면 설정만 이 기기에 저장합니다.</div>
         </dialog>`);
-    const seasonSelect = document.getElementById('season-select');
-    seasonSelect.value = state.season;
-    seasonSelect.addEventListener('change', (event) => onSeasonChange(event.target.value));
+    if (!isSchedule) {
+        const seasonSelect = document.getElementById('season-select');
+        seasonSelect.value = state.season;
+        seasonSelect.addEventListener('change', (event) => onSeasonChange(event.target.value));
+    }
     bindShellEvents();
 }
 

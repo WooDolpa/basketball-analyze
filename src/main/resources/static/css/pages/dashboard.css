@@ -1,49 +1,17 @@
-/* 농구공 오렌지와 우드 코트 색상을 대시보드의 공통 UI에 적용합니다. */
-body[data-page="dashboard"] {
-    --bg: #151311;
-    --sidebar-bg: #1b1815;
-    --surface: #231e19;
-    --surface-hover: #33251c;
-    --surface-soft: #2b211b;
-    --border: #4a3c31;
-    --border-soft: #382d26;
-    --text: #fff1e2;
-    --text-secondary: #e3cbb5;
-    --muted: #cbb5a1;
-    --subtle: #ac9481;
-    --muted-line: #80614a;
-    --accent: #ff9955;
-    --accent-soft: #40291d;
-    --orange: #d6a977;
-    --prediction-accent-border: #a8653c;
+/* 오늘 예정 경기 목록, 선택 경기 상세와 조회 상태를 배치합니다. */
+.prediction-cards {
     --prediction-home-mark: #eaa776;
     --prediction-away-mark: #d6c0aa;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
 }
 
-.nav-link.is-active { background: var(--accent-soft); border-color: var(--border); }
-.sidebar-note, .user-avatar { background: var(--surface-soft); border-color: var(--border); }
-.tiny-court, .tiny-court::before, .tiny-court i { border-color: var(--border); }
-.user-avatar, .page-heading h1 span { color: var(--text-secondary); }
-.metric-top .icon { color: var(--subtle); }
-.button-secondary, .select-wrap select, .guide-dialog { border-color: var(--border); }
-.button-secondary:hover, .overview-link:hover { background: var(--surface-hover); border-color: var(--prediction-accent-border); }
-.toast { background: var(--accent-soft); border-color: var(--border); }
-
-/* 오늘 예정 경기 목록, 선택 경기 상세와 조회 상태를 배치합니다. */
 .matchups-section .section-heading h2 { font-size: 21px; }
 .prediction-caption { margin-top: 4px; color: var(--muted); font-size: 12px; }
-.prediction-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
 .prediction-cards .prediction-card { gap: 8px; padding: 14px 16px; }
-.prediction-cards .prediction-card:hover,
-.prediction-cards .prediction-card.is-selected {
-    background: var(--surface-hover);
-    border-color: var(--prediction-accent-border);
-}
 .prediction-card .match-card-top { padding: 0; font-size: 12px; }
 .prediction-card .match-status, .prediction-card .match-card-team > span:nth-child(2) { font-size: 12px; }
 .prediction-card .match-card-team { margin: 0; }
 .prediction-card .match-card-team > span:nth-child(2) { white-space: normal; overflow-wrap: anywhere; }
-.prediction-card .team-badge { background: var(--surface-soft); }
 .prediction-cards .prediction-card.is-selected .match-card-team > b { color: var(--text-secondary); }
 .prediction-details { margin-top: 14px; gap: 14px; }
 .prediction-panel { min-width: 0; padding: 16px; }
@@ -64,7 +32,7 @@ body[data-page="dashboard"] {
     font-weight: 500;
 }
 .prediction-bar { height: 7px; margin-top: 6px; overflow: hidden; border-radius: 4px; background: var(--muted-line); }
-.prediction-bar > span { display: block; height: 100%; background: var(--orange); }
+.prediction-bar > span { display: block; height: 100%; background: var(--wood); }
 .prediction-bar.home-leading > span { background: var(--accent); }
 .prediction-bar.away-leading { background: var(--accent); }
 .prediction-bar.away-leading > span { background: var(--muted-line); }
@@ -78,6 +46,7 @@ body[data-page="dashboard"] {
 .overview-section { margin-top: 28px; }
 .overview-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .overview-link { display: block; padding: 22px; transition: border-color .18s, background .18s; }
+.overview-link:hover { background: var(--surface-hover); border-color: var(--accent-border); }
 .overview-link-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 11px; }
 .overview-link-top > span { display: inline-flex; align-items: center; gap: 9px; }
 .overview-link-top > .icon { width: 15px; height: 15px; color: var(--accent); }

@@ -1,78 +1,53 @@
-import { icon, pageHref, teamBadge } from './ui.js';
-import { escapeHtml } from '../utils/format.js';
+import { teamBadge } from './ui.js';
+import { escapeHtml, formatKoreanTime, formatMatchStatus } from '../utils/format.js';
 
-/** 대시보드의 이동 링크 또는 일정 페이지의 경기 선택 카드를 만듭니다. */
-export function matchCard(match, { selected = false, href = null } = {}) {
-    const attributes = href
-        ? `href="${escapeHtml(href)}"`
-        : `type="button" data-match="${match.id}" aria-pressed="${selected}"`;
-    const tag = href ? 'a' : 'button';
-    return `<${tag} ${attributes} class="match-card ${selected ? 'is-selected' : ''}"
-                aria-label="${escapeHtml(match.home.fullName)} 대 ${escapeHtml(match.away.fullName)} 분석 보기">
-        <span class="match-card-top">
-            <span class="match-status ${match.status === 'finished' ? 'finished' : ''}">${match.status === 'finished' ? '경기 종료' : '경기 예정'}</span>
-            <span>${match.time}</span>
-        </span>
-        <span class="match-card-team">${teamBadge(match.home)}
-            <span>${match.home.city} <strong>${match.home.name}</strong></span>
-            <b>${match.status === 'finished' ? match.homeScore : `${match.homeProbability}%`}</b>
-        </span>
-        <span class="match-card-team">${teamBadge(match.away)}
-            <span>${match.away.city} <strong>${match.away.name}</strong></span>
-            <b>${match.status === 'finished' ? match.awayScore : `${100 - match.homeProbability}%`}</b>
-        </span>
-        <span class="match-card-footer"><span>${match.status === 'finished' ? '경기 분석 보기' : '예상 승리 확률'}</span>${icon('arrow-up-right')}</span>
-    </${tag}>`;
+/** 일정의 시작 시간과 상태를 카드와 상세에서 같은 형식으로 표시합니다. */
+function scheduleMatchTime(match) {
+    const statusClass = match.status === 'FINISHED' ? ' finished' : '';
+    return `<span class="match-status${statusClass}">${formatMatchStatus(match.status)}</span>
+        <time datetime="${escapeHtml(match.startsAt)}">${formatKoreanTime(match.startsAt)}</time>`;
 }
 
-/** 선택 경기의 확률 프리뷰와 독립 팀관리 페이지 링크를 표시합니다. */
-export function renderMatchPreview(container, match, seasonId) {
-    const probability = match.homeProbability;
-    const teamHref = pageHref('teamManagement', { team: match.home.id, season: seasonId });
+/** 일정 페이지에서 홈·원정팀, 합계 점수, 시작 시간을 표시하는 경기 카드를 만듭니다. */
+export function scheduleMatchCard(match, selected) {
+    const { homeTeam, awayTeam, homeScore, awayScore } = match;
+    return `<button type="button" class="match-card schedule-match-card${selected ? ' is-selected' : ''}"
+            data-match="${escapeHtml(match.matchCode)}" aria-pressed="${selected}" aria-controls="featured-match">
+        <span class="match-card-top">${scheduleMatchTime(match)}</span>
+        <span class="match-card-team">${teamBadge({ mark: homeTeam.code, color: 'var(--accent)' })}
+            <span><strong>${escapeHtml(homeTeam.name)}</strong></span><b>${homeScore ?? '—'}</b>
+        </span>
+        <span class="match-card-team">${teamBadge({ mark: awayTeam.code, color: 'var(--text-secondary)' })}
+            <span><strong>${escapeHtml(awayTeam.name)}</strong></span><b>${awayScore ?? '—'}</b>
+        </span>
+    </button>`;
+}
+
+/** 선택 경기의 1~4쿼터 점수와 양 팀 합계를 표로 표시합니다. */
+export function renderScheduleMatchDetail(container, match) {
+    const teams = [
+        { name: match.homeTeam.name, side: '홈', score: 'homeScore' },
+        { name: match.awayTeam.name, side: '원정', score: 'awayScore' },
+    ];
+    const quarterHeadings = match.quarters.map(({ quarter }) => `<th scope="col">${quarter}Q</th>`).join('');
+    const teamRows = teams.map(({ name, side, score }) => `<tr>
+        <th scope="row"><span class="schedule-team-side">${side}</span>${escapeHtml(name)}</th>
+        ${match.quarters.map((quarter) => `<td>${quarter[score] ?? '—'}</td>`).join('')}
+        <td class="schedule-total-score">${match[score] ?? '—'}</td>
+    </tr>`).join('');
     container.innerHTML = `
-        <div class="preview-heading">
-            <div><span class="eyebrow">MATCH PREVIEW</span><h2>선택 경기 프리뷰</h2></div>
-            <span class="preview-tag">예측 예시 ${icon('spark')}</span>
+        <div class="schedule-detail-heading">
+            <h2 id="schedule-detail-title">${escapeHtml(match.homeTeam.name)} <span>vs</span> ${escapeHtml(match.awayTeam.name)}</h2>
+            <div class="schedule-detail-meta">${scheduleMatchTime(match)}</div>
         </div>
-        <div class="match-showdown">
-            <div class="showdown-team">${teamBadge(match.home, 'large')}<span class="home-away">HOME</span>
-                <h3>${match.home.city} ${match.home.name}</h3><span>${match.home.wins}승 ${match.home.losses}패</span></div>
-            <div class="showdown-center"><span class="versus">VS</span>
-                <span class="tipoff">${match.status === 'finished' ? 'FINAL' : 'TIP-OFF'} <strong>${match.time}</strong></span>
-                <span class="court-date">${match.date.getMonth() + 1}월 ${match.date.getDate()}일 · 정규시즌</span></div>
-            <div class="showdown-team">${teamBadge(match.away, 'large')}<span class="home-away">AWAY</span>
-                <h3>${match.away.city} ${match.away.name}</h3><span>${match.away.wins}승 ${match.away.losses}패</span></div>
-        </div>
-        <div class="probability-heading"><span>예상 승리 확률 <span class="inline-demo">DEMO</span></span>
-            <span class="confidence-label"><i></i>확신도 ${match.confidence}</span></div>
-        <div class="probability-labels">
-            <span class="${probability >= 50 ? 'accent-text' : ''}">${match.home.name} <strong>${probability}<small>%</small></strong></span>
-            <span class="${probability < 50 ? 'accent-text' : ''}"><strong>${100 - probability}<small>%</small></strong> ${match.away.name}</span>
-        </div>
-        <div class="probability-bar" role="img" aria-label="예시 승리 확률 ${match.home.name} ${probability}퍼센트, ${match.away.name} ${100 - probability}퍼센트">
-            <span style="width:${probability}%"></span><i></i></div>
-        <div class="preview-bottom"><span>${icon('location')}${escapeHtml(match.home.stadium)}</span>
-            <a href="${escapeHtml(teamHref)}" class="text-button">홈팀 정보 보기 ${icon('arrow-right')}</a></div>`;
+        <div class="schedule-score-wrap">
+            <table class="schedule-score-table">
+                <caption class="sr-only">홈·원정팀 쿼터별 점수</caption>
+                <thead><tr><th scope="col">팀</th>${quarterHeadings}<th scope="col">합계</th></tr></thead>
+                <tbody>${teamRows}</tbody>
+            </table>
+        </div>`;
 }
-
-/** 경기 예측의 예시 근거를 재사용 가능한 요약 목록으로 표시합니다. */
-export function renderMatchInsights(container, match) {
-    const favorite = match.homeProbability >= 50 ? match.home : match.away;
-    container.innerHTML = `
-        <div class="insight-item"><span class="insight-number">01</span>
-            <div><p>${favorite.name}, 근소한 우세</p><span>예시 모델의 예상 승리 확률</span></div>
-            <strong class="accent-text">${Math.max(match.homeProbability, 100 - match.homeProbability)}<small>%</small></strong></div>
-        <div class="insight-item"><span class="insight-number">02</span>
-            <div><p>최근 경기의 상승 흐름</p><span>${favorite.name} 최근 5경기 예시 성적</span></div>
-            <strong>${[...favorite.form].filter((result) => result === 'W').length}<small>승</small></strong></div>
-        <div class="insight-item"><span class="insight-number">03</span>
-            <div><p>홈코트 어드밴티지</p><span>${match.home.name} 홈 경기 승률 예시</span></div>
-            <strong>66.7<small>%</small></strong></div>`;
-}
-
-const koreanTipoffTime = new Intl.DateTimeFormat('ko-KR', {
-    hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Seoul',
-});
 
 /** Elo와 승률을 소수점 첫째 자리까지 표시하고 비어 있는 값은 대시로 표시합니다. */
 function formatPredictionNumber(value, suffix = '') {
@@ -82,7 +57,7 @@ function formatPredictionNumber(value, suffix = '') {
 /** 오늘 예정 경기와 API가 반환한 양 팀의 승률로 선택 버튼을 구성합니다. */
 export function predictionMatchCard(match, index) {
     const { homeTeam, awayTeam, startsAt, prediction } = match;
-    const tipoff = koreanTipoffTime.format(new Date(startsAt));
+    const tipoff = formatKoreanTime(startsAt);
     return `<button type="button" class="match-card prediction-card" data-prediction-index="${index}" aria-pressed="false">
         <span class="match-card-top">
             <span class="match-status">경기 예정</span>
@@ -107,7 +82,7 @@ export function renderPredictionDetail(preview, insights, match) {
     const { homeWinPercentage, awayWinPercentage, homeElo, awayElo, reason } = prediction;
     const homeName = escapeHtml(homeTeam.name);
     const awayName = escapeHtml(awayTeam.name);
-    const tipoff = koreanTipoffTime.format(new Date(startsAt));
+    const tipoff = formatKoreanTime(startsAt);
     const homeWin = formatPredictionNumber(homeWinPercentage, '%');
     const awayWin = formatPredictionNumber(awayWinPercentage, '%');
     const homeLeading = homeWinPercentage > awayWinPercentage;

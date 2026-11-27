@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#111312">
+    <meta name="theme-color" content="#151311">
     <meta name="description" content="COURTSIDE 남자 KBL 로컬 분석 워크스페이스 — 리그 순위">
     <title>리그 순위 — COURTSIDE</title>
     <link rel="icon" href="/assets/icons/court.svg" type="image/svg+xml">
@@ -20,11 +20,17 @@
     <main id="main-content">
 
         <section class="page-heading" aria-labelledby="page-title"><div><div class="eyebrow"><span class="small-line"></span>LEAGUE TABLE</div><h1 id="page-title">리그 순위</h1><p>열 팀의 경쟁, 순위와 최근 흐름으로 살펴보세요.</p></div><span class="season-caption" id="season-caption"></span></section>
-        <section class="metrics-grid standings-metrics" id="standings-metrics" aria-label="리그 순위 요약"></section>
+        <section class="metrics-grid standings-metrics" id="standings-metrics" aria-label="리그 순위 요약" hidden></section>
         <section class="standings-panel panel" aria-labelledby="standings-title">
             <div class="panel-heading"><div><h2 id="standings-title">정규시즌 팀 순위</h2><p class="panel-subtitle" id="standings-season"></p></div><span class="micro-label">STANDINGS</span></div>
-            <div class="table-scroll"><table class="standings-table"><caption class="sr-only">예시 KBL 팀 순위. 팀을 선택하면 해당 팀의 팀관리 페이지로 이동합니다.</caption><thead><tr><th scope="col">순위</th><th scope="col">팀</th><th scope="col">경기</th><th scope="col">승</th><th scope="col">패</th><th scope="col">승률</th><th scope="col">최근 5경기</th></tr></thead><tbody id="standings-body"></tbody></table></div>
-            <div class="table-footnote"><span class="playoff-key"></span>상위 6팀 플레이오프 진출권<span>팀 이름을 누르면 팀관리로 이동합니다 ↗</span></div>
+            <div class="standings-status" id="standings-status">
+                <p id="standings-status-message" role="status">리그 순위를 불러오는 중입니다.</p>
+                <button class="button button-secondary" id="retry-standings" type="button" hidden>다시 조회</button>
+            </div>
+            <div id="standings-results" hidden>
+                <div class="table-scroll"><table class="standings-table"><caption class="sr-only">KBL 팀 순위. 최근 경기 결과는 오른쪽이 최신입니다.</caption><thead><tr><th scope="col">순위</th><th scope="col">팀</th><th scope="col">경기</th><th scope="col">승</th><th scope="col">패</th><th scope="col">승률</th><th scope="col">최근 5경기</th></tr></thead><tbody id="standings-body"></tbody></table></div>
+                <div class="table-footnote"><span class="playoff-key"></span>플레이오프 기준 6위<span>최근 경기 결과는 오른쪽이 최신</span></div>
+            </div>
         </section>
     </main>
     <noscript><div class="noscript-message">화면을 보려면 브라우저에서 JavaScript를 활성화해주세요.</div></noscript>

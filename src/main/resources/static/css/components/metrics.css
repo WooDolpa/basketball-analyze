@@ -1,7 +1,7 @@
 /* metrics: 페이지와 독립적인 분석 위젯 스타일입니다. */
 .metric-card { min-width: 0; padding: 18px 20px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
 .metric-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 10px; }
-.metric-top .icon { width: 16px; height: 16px; color: #7b8970; }
+.metric-top .icon { width: 16px; height: 16px; color: var(--subtle); }
 .metric-value { display: flex; align-items: baseline; gap: 6px; margin-top: 13px; font-family: var(--font-numeric); font-size: 34px; line-height: 1.2; font-weight: 500; letter-spacing: -1.2px; }
 .metric-value > span { color: var(--muted); font-family: var(--font); font-size: 12px; font-weight: 400; letter-spacing: -.3px; }
 .metric-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; min-height: 30px; margin-top: 5px; }

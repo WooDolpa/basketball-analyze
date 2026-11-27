@@ -86,6 +86,12 @@ class KblClient {
         return detail;
     }
 
+    /** 지정한 경기의 홈·원정 선수 박스스코어를 읽습니다. */
+    List<GamePlayerStat> fetchGamePlayerStats(String matchCode) {
+        return fetch("경기 " + matchCode + " 선수 기록", uri -> uri.path("/match/{matchCode}/player-stat")
+                .build(matchCode), new ParameterizedTypeReference<>() {});
+    }
+
     /** KBL 목록 응답에 배열과 유효한 행이 들어 있는지 확인합니다. */
     private <T> List<T> fetch(String description, Function<UriBuilder, URI> uri, ParameterizedTypeReference<List<T>> type) {
         List<T> rows = request(description, uri, type);
@@ -157,5 +163,37 @@ class KblClient {
             @JsonProperty("scoreq3") Integer thirdQuarter,
             @JsonProperty("scoreq4") Integer fourthQuarter,
             @JsonProperty("scoreeq") List<Integer> overtime
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record GamePlayerStat(GamePlayer player, PlayerBoxScore records, String homeAway, Integer startFlag) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record GamePlayer(@JsonProperty("pcode") String code, @JsonProperty("tcode") String teamCode) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record PlayerBoxScore(
+            @JsonProperty("playMin") Integer minutes,
+            @JsonProperty("playSec") Integer seconds,
+            Integer inout,
+            Integer inout1,
+            @JsonProperty("score") Integer points,
+            @JsonProperty("offr") Integer offensiveRebounds,
+            @JsonProperty("defr") Integer defensiveRebounds,
+            @JsonProperty("rb") Integer rebounds,
+            @JsonProperty("ast") Integer assists,
+            @JsonProperty("stl") Integer steals,
+            @JsonProperty("bs") Integer blocks,
+            @JsonProperty("to") Integer turnovers,
+            @JsonProperty("foul") Integer fouls,
+            @JsonProperty("fgt") Integer fieldGoalsMade,
+            @JsonProperty("fgtA") Integer fieldGoalsAttempted,
+            @JsonProperty("fg") Integer twoPointersMade,
+            @JsonProperty("fgA") Integer twoPointersAttempted,
+            @JsonProperty("threep") Integer threePointersMade,
+            @JsonProperty("threepA") Integer threePointersAttempted,
+            @JsonProperty("ft") Integer freeThrowsMade,
+            @JsonProperty("ftA") Integer freeThrowsAttempted,
+            @JsonProperty("marginCn") Integer plusMinus
     ) {}
 }

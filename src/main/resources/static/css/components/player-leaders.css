@@ -4,15 +4,14 @@
 .player-leaders { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--border); }
 .player-card { position: relative; min-width: 0; padding: 18px 20px 19px; }
 .player-card + .player-card { border-left: 1px solid var(--border); }
-.player-card.is-leading { background: #20281a; }
+.player-card.is-leading { background: var(--surface-hover); }
 .player-rank { font-family: var(--font-numeric); font-size: 10px; color: var(--subtle); }
 .is-leading .player-rank { color: var(--accent); }
 .player-identity { display: flex; gap: 9px; align-items: center; margin-top: 9px; }
 .player-identity > div:last-child { min-width: 0; }
 .player-identity h3 { color: var(--text-secondary); font-size: 11px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.player-identity p { display: flex; align-items: center; gap: 4px; margin-top: 3px; color: var(--subtle); font-size: 8px; white-space: nowrap; }
-.player-identity p i { width: 3px; height: 3px; border-radius: 50%; }
-.jersey-avatar { display: grid; align-items: center; justify-content: center; width: 36px; height: 39px; flex-shrink: 0; clip-path: polygon(25% 0, 37% 8%, 63% 8%, 75% 0, 100% 20%, 86% 43%, 78% 37%, 78% 100%, 22% 100%, 22% 37%, 14% 43%, 0 20%); background: color-mix(in srgb, var(--team-color) 22%, #272d25); color: color-mix(in srgb, var(--team-color) 90%, white); }
+.player-identity p { margin-top: 3px; color: var(--subtle); font-size: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jersey-avatar { display: grid; align-items: center; justify-content: center; width: 36px; height: 39px; flex-shrink: 0; clip-path: polygon(25% 0, 37% 8%, 63% 8%, 75% 0, 100% 20%, 86% 43%, 78% 37%, 78% 100%, 22% 100%, 22% 37%, 14% 43%, 0 20%); background: color-mix(in srgb, var(--team-color) 22%, var(--surface-soft)); color: color-mix(in srgb, var(--team-color) 90%, white); }
 .jersey-avatar > span { padding-top: 5px; font-family: var(--font-numeric); font-size: 12px; font-weight: 500; }
 .player-value { display: flex; align-items: baseline; gap: 7px; margin: 16px 0 0 44px; }
 .player-value strong { font-family: var(--font-numeric); font-size: 27px; font-weight: 450; letter-spacing: -1px; line-height: 1; }

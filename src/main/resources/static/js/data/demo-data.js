@@ -1,15 +1,15 @@
 /** 실제 기록과 분리한 화면 검토용 팀 데이터입니다. */
 export const TEAMS = [
-    { id: 'sk', city: '서울', name: 'SK', fullName: '서울 SK 나이츠', mark: 'SK', color: '#e96c62', wins: 7, losses: 2, form: 'WWLWW', stadium: '잠실학생체육관' },
-    { id: 'lg', city: '창원', name: 'LG', fullName: '창원 LG 세이커스', mark: 'LG', color: '#c97393', wins: 6, losses: 2, form: 'WLWWW', stadium: '창원체육관' },
-    { id: 'kt', city: '수원', name: 'KT', fullName: '수원 KT 소닉붐', mark: 'KT', color: '#e06c60', wins: 6, losses: 3, form: 'WWLWW', stadium: '수원 KT 소닉붐 아레나' },
-    { id: 'db', city: '원주', name: 'DB', fullName: '원주 DB 프로미', mark: 'DB', color: '#71bca0', wins: 5, losses: 3, form: 'LWWLW', stadium: '원주DB프로미아레나' },
-    { id: 'kgc', city: '안양', name: '정관장', fullName: '안양 정관장 레드부스터스', mark: 'JKJ', color: '#d28076', wins: 5, losses: 4, form: 'WLWLW', stadium: '안양 정관장 아레나' },
-    { id: 'kcc', city: '부산', name: 'KCC', fullName: '부산 KCC 이지스', mark: 'KCC', color: '#7b9ac9', wins: 4, losses: 4, form: 'LWWLL', stadium: '부산사직체육관' },
-    { id: 'hd', city: '울산', name: '현대모비스', fullName: '울산 현대모비스 피버스', mark: 'MOB', color: '#db9a6c', wins: 4, losses: 5, form: 'WLLWL', stadium: '울산동천체육관' },
-    { id: 'sono', city: '고양', name: '소노', fullName: '고양 소노 스카이거너스', mark: 'SONO', color: '#86b6d5', wins: 3, losses: 5, form: 'LLWWL', stadium: '고양소노아레나' },
-    { id: 'gas', city: '대구', name: '한국가스공사', fullName: '대구 한국가스공사 페가수스', mark: 'GAS', color: '#9ca0d1', wins: 2, losses: 6, form: 'LWLLL', stadium: '대구체육관' },
-    { id: 'ss', city: '서울', name: '삼성', fullName: '서울 삼성 썬더스', mark: 'SS', color: '#719ed8', wins: 1, losses: 9, form: 'LLLWL', stadium: '잠실실내체육관' },
+    { id: 'sk', code: '55', city: '서울', name: 'SK', fullName: '서울 SK 나이츠', mark: 'SK', color: '#e96c62', wins: 7, losses: 2, form: 'WWLWW', stadium: '잠실학생체육관' },
+    { id: 'lg', code: '50', city: '창원', name: 'LG', fullName: '창원 LG 세이커스', mark: 'LG', color: '#c97393', wins: 6, losses: 2, form: 'WLWWW', stadium: '창원체육관' },
+    { id: 'kt', code: '06', city: '수원', name: 'KT', fullName: '수원 KT 소닉붐', mark: 'KT', color: '#e06c60', wins: 6, losses: 3, form: 'WWLWW', stadium: '수원 KT 소닉붐 아레나' },
+    { id: 'db', code: '16', city: '원주', name: 'DB', fullName: '원주 DB 프로미', mark: 'DB', color: '#71bca0', wins: 5, losses: 3, form: 'LWWLW', stadium: '원주DB프로미아레나' },
+    { id: 'kgc', code: '70', city: '안양', name: '정관장', fullName: '안양 정관장 레드부스터스', mark: 'JKJ', color: '#d28076', wins: 5, losses: 4, form: 'WLWLW', stadium: '안양 정관장 아레나' },
+    { id: 'kcc', code: '60', city: '부산', name: 'KCC', fullName: '부산 KCC 이지스', mark: 'KCC', color: '#7b9ac9', wins: 4, losses: 4, form: 'LWWLL', stadium: '부산사직체육관' },
+    { id: 'hd', code: '10', city: '울산', name: '현대모비스', fullName: '울산 현대모비스 피버스', mark: 'MOB', color: '#db9a6c', wins: 4, losses: 5, form: 'WLLWL', stadium: '울산동천체육관' },
+    { id: 'sono', code: '66', city: '고양', name: '소노', fullName: '고양 소노 스카이거너스', mark: 'SONO', color: '#86b6d5', wins: 3, losses: 5, form: 'LLWWL', stadium: '고양소노아레나' },
+    { id: 'gas', code: '64', city: '대구', name: '한국가스공사', fullName: '대구 한국가스공사 페가수스', mark: 'GAS', color: '#9ca0d1', wins: 2, losses: 6, form: 'LWLLL', stadium: '대구체육관' },
+    { id: 'ss', code: '35', city: '서울', name: '삼성', fullName: '서울 삼성 썬더스', mark: 'SS', color: '#719ed8', wins: 1, losses: 9, form: 'LLLWL', stadium: '잠실실내체육관' },
 ];
 
 export const SEASONS = {

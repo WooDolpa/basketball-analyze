@@ -1,21 +1,22 @@
 /* 색상·타이포그래피·접근성 등 모든 화면에서 사용하는 기반 스타일입니다. */
 :root {
     color-scheme: dark;
-    --bg: #111412;
-    --sidebar-bg: #131613;
-    --surface: #191d19;
-    --surface-hover: #202620;
-    --surface-soft: #1e231e;
-    --border: #2b322b;
-    --border-soft: #252c25;
-    --text: #f0f2eb;
-    --text-secondary: #bac1b6;
-    --muted: #929c8e;
-    --subtle: #87917e;
-    --muted-line: #6b7c60;
-    --accent: #c5f36b;
-    --accent-soft: #26321b;
-    --orange: #eaa776;
+    --bg: #151311;
+    --sidebar-bg: #1b1815;
+    --surface: #231e19;
+    --surface-hover: #33251c;
+    --surface-soft: #2b211b;
+    --border: #4a3c31;
+    --border-soft: #382d26;
+    --text: #fff1e2;
+    --text-secondary: #e3cbb5;
+    --muted: #cbb5a1;
+    --subtle: #ac9481;
+    --muted-line: #80614a;
+    --accent: #ff9955;
+    --accent-soft: #40291d;
+    --accent-border: #a8653c;
+    --wood: #d6a977;
     --sidebar-width: 216px;
     --radius: 12px;
     --font: 'Segoe UI Variable Text', 'Segoe UI', 'Malgun Gothic', sans-serif;
@@ -37,7 +38,7 @@ h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { line-height: 1.4; word-break: keep-all; }
 svg { display: block; }
 [hidden] { display: none !important; }
-::selection { color: #14200d; background: var(--accent); }
+::selection { color: var(--bg); background: var(--accent); }
 select { color: var(--text); color-scheme: dark; }
 option { background: var(--surface); }
 small { font-size: inherit; }

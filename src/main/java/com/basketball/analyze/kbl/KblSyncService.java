@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.basketball.analyze.kbl.KblSyncRepository.MatchStatus.FINISHED;
 import static com.basketball.analyze.kbl.KblSyncRepository.MatchStatus.LIVE;
@@ -40,12 +41,17 @@ class KblSyncService {
             .withResolverStyle(ResolverStyle.STRICT);
 
     private final KblClient client;
+    private final KblPlayerClient playerClient;
     private final KblSyncRepository repository;
+    private final KblMatchPlayerRecordRepository matchPlayerRecordRepository;
 
     /** 외부 조회·검증이 끝난 후에만 저장 트랜잭션을 시작합니다. */
-    KblSyncService(KblClient client, KblSyncRepository repository) {
+    KblSyncService(KblClient client, KblPlayerClient playerClient, KblSyncRepository repository,
+                   KblMatchPlayerRecordRepository matchPlayerRecordRepository) {
         this.client = client;
+        this.playerClient = playerClient;
         this.repository = repository;
+        this.matchPlayerRecordRepository = matchPlayerRecordRepository;
     }
 
     // 한 로컬 앱에서 수집 요청을 순차 처리해 늦게 도착한 이전 응답이 최신 데이터를 덮지 않게 합니다.
@@ -78,6 +84,19 @@ class KblSyncService {
         }
         repository.saveTeams(teams);
         return new SyncResult(teams.size(), teams.size());
+    }
+
+    /** 현재 등록 명단의 팀 코드를 검증하고 시즌 팀과 선수의 소속 관계를 저장합니다. */
+    synchronized RosterSyncResult syncRosters(String leagueKey) {
+        requireSupportedLeague(leagueKey);
+        List<KblPlayerClient.RegisteredPlayer> players = playerClient.fetchRegisteredPlayers();
+        Set<String> teamCodes = new HashSet<>();
+        for (KblPlayerClient.RegisteredPlayer player : players) {
+            validateTeamCode(player.teamCode(), "선수 " + player.code());
+            teamCodes.add(player.teamCode());
+        }
+        repository.saveRosters(SEASON_ID, leagueKey, players);
+        return new RosterSyncResult(SEASON_ID, teamCodes.size(), players.size());
     }
 
     /** 시즌별 순위와 승패·승률·승차의 저장 가능 여부를 검증합니다. */
@@ -139,7 +158,21 @@ class KblSyncService {
     }
 
     /** 기간 내 종료 경기를 순서대로 수집하고 각 경기의 실패를 기록한 뒤 다음 경기를 처리합니다. */
-    synchronized QuarterRangeSyncResult syncMatchQuartersInRange(String leagueKey, String from, String to) {
+    synchronized MatchRangeSyncResult syncMatchQuartersInRange(String leagueKey, String from, String to) {
+        return syncFinishedMatchesInRange(leagueKey, from, to, "쿼터 점수", this::syncMatchQuarters);
+    }
+
+    /** 기간 내 종료 경기의 선수 기록을 조회해 경기 단위로 저장합니다. */
+    synchronized MatchRangeSyncResult syncMatchPlayerRecordsInRange(String leagueKey, String from, String to) {
+        return syncFinishedMatchesInRange(leagueKey, from, to, "선수 기록", matchCode -> {
+            List<KblClient.GamePlayerStat> stats = client.fetchGamePlayerStats(matchCode);
+            matchPlayerRecordRepository.saveMatchPlayerRecords(SEASON_ID, leagueKey, matchCode, stats);
+        });
+    }
+
+    /** 공통 기간 검증 후 종료 경기만 수집하며 경기별 성공과 실패를 집계합니다. */
+    private MatchRangeSyncResult syncFinishedMatchesInRange(String leagueKey, String from, String to,
+                                                            String recordLabel, Consumer<String> syncMatch) {
         requireSupportedLeague(leagueKey);
         LocalDate fromDate = parseRequestDate(from);
         LocalDate toDate = parseRequestDate(to);
@@ -151,19 +184,19 @@ class KblSyncService {
         }
 
         List<String> matchCodes = repository.findFinishedMatchCodes(SEASON_ID, fromDate, toDate);
-        List<QuarterSyncFailure> failures = new ArrayList<>();
+        List<MatchSyncFailure> failures = new ArrayList<>();
         for (String matchCode : matchCodes) {
             try {
-                syncMatchQuarters(matchCode);
+                syncMatch.accept(matchCode);
             } catch (ResponseStatusException exception) {
-                failures.add(new QuarterSyncFailure(matchCode, exception.getStatusCode().value(), exception.getReason()));
+                failures.add(new MatchSyncFailure(matchCode, exception.getStatusCode().value(), exception.getReason()));
             } catch (DataAccessException | TransactionException exception) {
-                LOGGER.error("경기 {}의 쿼터 점수 DB 처리에 실패했습니다.", matchCode, exception);
-                failures.add(new QuarterSyncFailure(matchCode, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "쿼터 점수 데이터베이스 처리에 실패했습니다."));
+                LOGGER.error("경기 {}의 {} DB 처리에 실패했습니다.", matchCode, recordLabel, exception);
+                failures.add(new MatchSyncFailure(matchCode, HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        recordLabel + " 데이터베이스 처리에 실패했습니다."));
             }
         }
-        return new QuarterRangeSyncResult(SEASON_ID, fromDate, toDate, matchCodes.size(),
+        return new MatchRangeSyncResult(SEASON_ID, fromDate, toDate, matchCodes.size(),
                 matchCodes.size() - failures.size(), failures.size(), List.copyOf(failures));
     }
 
@@ -325,20 +358,22 @@ class KblSyncService {
 
     record SyncResult(int fetchedCount, int processedCount) {}
 
+    record RosterSyncResult(String seasonId, int teamCount, int playerCount) {}
+
     /** 저장을 완료한 경기 코드와 1~4쿼터 점수를 반환합니다. */
     record QuarterSyncResult(String matchCode, List<KblSyncRepository.QuarterScore> quarters) {}
 
     /** 조회 기간과 대상·저장·실패 경기 수를 반환합니다. */
-    record QuarterRangeSyncResult(
+    record MatchRangeSyncResult(
             String seasonId,
             @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDate fromDate,
             @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDate toDate,
             int targetCount,
             int savedCount,
             int failedCount,
-            List<QuarterSyncFailure> failures
+            List<MatchSyncFailure> failures
     ) {}
 
     /** 실패한 경기와 원인을 식별할 수 있는 상태 코드 및 상세 메시지를 담습니다. */
-    record QuarterSyncFailure(String matchCode, int status, String detail) {}
+    record MatchSyncFailure(String matchCode, int status, String detail) {}
 }

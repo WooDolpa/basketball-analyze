@@ -55,7 +55,8 @@
     ],
     "indexIds": [
       "03hmatchfix000000000000004",
-      "03hplayerrecord0000000030"
+      "03hplayerrecord0000000030",
+      "03hplayersync000000000001"
     ],
     "memoIds": [
       "03hmatchfix000000000000017",
@@ -237,6 +238,7 @@
           "03hplayerrecord0000000003",
           "03hplayerrecord0000000004",
           "03hplayerrecord0000000005",
+          "03hplayerrecord0000000034",
           "03hplayerrecord0000000006",
           "03hplayerrecord0000000007",
           "03hplayerrecord0000000008",
@@ -423,9 +425,9 @@
         "id": "03h4adwy2zvff1cz2tta6hog6",
         "tableId": "03h49wxbhlcwqrzfvnotas8v9",
         "name": "height",
-        "comment": "키",
+        "comment": "키(cm, 미확인 NULL)",
         "dataType": "DECIMAL(5,2)",
-        "options": 8
+        "options": 0
       },
       "03h4ae21q0mh3d50kyvemda6z": {
         "id": "03h4ae21q0mh3d50kyvemda6z",
@@ -1007,6 +1009,14 @@
         "dataType": "INT",
         "options": 0
       },
+      "03hplayerrecord0000000034": {
+        "id": "03hplayerrecord0000000034",
+        "tableId": "03hplayerrecord0000000001",
+        "name": "appeared",
+        "comment": "실제 출전 여부(미확인 NULL)",
+        "dataType": "BOOLEAN",
+        "options": 0
+      },
       "03hplayerrecord0000000007": {
         "id": "03hplayerrecord0000000007",
         "tableId": "03hplayerrecord0000000001",
@@ -1365,6 +1375,15 @@
       }
     },
     "indexEntities": {
+      "03hplayersync000000000001": {
+        "id": "03hplayersync000000000001",
+        "name": "uq_player_code",
+        "tableId": "03h49wxbhlcwqrzfvnotas8v9",
+        "indexColumnIds": [
+          "03hplayersync000000000002"
+        ],
+        "unique": true
+      },
       "03hmatchfix000000000000004": {
         "id": "03hmatchfix000000000000004",
         "name": "uq_cc_season_team_season_id",
@@ -1387,6 +1406,12 @@
       }
     },
     "indexColumnEntities": {
+      "03hplayersync000000000002": {
+        "id": "03hplayersync000000000002",
+        "indexId": "03hplayersync000000000001",
+        "columnId": "03h4aa5p1zynr0g2awa5qrnpu",
+        "orderType": 1
+      },
       "03hmatchfix000000000000005": {
         "id": "03hmatchfix000000000000005",
         "indexId": "03hmatchfix000000000000004",
