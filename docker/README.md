@@ -61,7 +61,7 @@ Flyway는 앱 시작 시 `src/main/resources/db/migration`의 버전 파일을 �
 
 별도 경로를 쓰려면 `Backup` 뒤에 새 SQL 파일 경로를 넘깁니다. `.env`와 기본 백업 폴더는 Git에서 제외됩니다. PC를 옮길 때는 사용할 Git 버전을 새 PC에서 체크아웃하고, SQL 파일을 별도로 복사한 뒤 새 PC의 `.env`를 구성합니다.
 
-2026-11-25 Mac 재적재 직후 만든 `basketball-20261125-232448.sql`은 별도 MariaDB에 복원해 검수했습니다. 현재 Windows 개발 DB의 Flyway `V3` 이력, 쿼터 점수, 선수 224명과 경기별 선수 기록 1,776행을 보관할 때는 위 절차로 현재 DB를 백업합니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
+2026-11-25 Mac 재적재 직후 만든 `basketball-20261125-232448.sql`은 별도 MariaDB에 복원해 검수했습니다. 2026-11-27 Windows 개발 DB의 Flyway `V3` 이력, 종료 경기 77건의 쿼터 점수, 선수 224명과 경기별 선수 기록 1,848행은 `basketball-20261127-172514.sql`에 백업했습니다. 이후 적재한 데이터를 보관할 때는 위 절차로 새로 백업합니다. [적재 건수 및 백업 검수 결과](../docs/project-status.md#개발-db-적재와-백업-결과)
 
 ## 새 PC에서 복원
 
